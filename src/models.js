@@ -1,4 +1,5 @@
-class ToDO {
+
+export class ToDO {
   constructor({title = "", description = "", dueDate = "", priority = "", checklist = false} = {}){
     this.title = title;
     this.description = description;
@@ -13,7 +14,7 @@ class ToDO {
 
 }
 
-class Project {
+export class Project {
   constructor(title = ""){
     this.project = title;
     this.id = crypto.randomUUID();

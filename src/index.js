@@ -1,5 +1,5 @@
 
-import {tasks, toLocalStoreage} from "./barrel.js"
+import {tasks, toLocalStoreage, el, form, displayToggleProjectPromt, addProjValues, toLocalStoreage, logProjectValues} from "./barrel.js"
 
 
 
@@ -25,4 +25,9 @@ el.addProjBtn.addEventListener("click", (e) => {
   addProjValues();
   toLocalStoreage(tasks);
   
+})
+
+el.addTodoBtn.addEventListener("click", (e) => {
+  addToDoValues(some);
+
 })
