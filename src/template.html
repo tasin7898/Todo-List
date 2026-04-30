@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="todo-form">
+    <form action="#" method="post" id="form">
+      <div id="close-form">X</div>
+      <label for="title-todo">Title: </label>
+      <input id="title-todo" type="text" name="title-todo" required>
+      
+      <label for="description">Description: </label>
+      <input type="text" id="description" name="description">
+
+      <label for="due-date">Due Date: </label>
+      <input type="date" id="due-date" name="due-date">
+
+      <label for="priority">Choose Priority</label>
+      <select id="priority" name="priority">
+        <option value="" selected disabled>Choose Priority</option>
+        <option value="low">Low</option>
+        <option value="medium">Medium</option>
+        <option value="high">High</option>
+      </select>
+      <input type="checkbox" id="checklist" name="checklist">
+      <label for="checklist">Finished</label>
+      <button type="button" name="action" value="clear" id="clear-todo-button">Add</button>
+      <button type="submit" name="action" value="add" id="add-todo-button">Add</button>
+    </form>
+    <dialog class="close-confirm">
+      <div class="prompt">
+        <div>You have unsaved changes. What would you like to do?</div>
+      </div>
+      <button class="discard" type="button" value="discard">Discard</button>
+      <button class="cancel" type="button" value="cancel">Cancel</button>
+    </dialog>
+  </div>
+</body>
+</html>

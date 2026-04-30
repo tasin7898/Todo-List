@@ -1,0 +1,25 @@
+class ToDO {
+  constructor({title = "", description = "", dueDate = "", priority = "", checklist = false} = {}){
+    this.title = title;
+    this.description = description;
+    this.dueDate = dueDate;
+    this.priority = priority;
+    this.checklist = checklist;
+    this.id = crypto.randomUUID();
+  }
+  toggleCheck(){
+    this.checklist = !this.checklist;
+  }
+
+}
+
+class Project {
+  constructor(title = ""){
+    this.project = title;
+    this.id = crypto.randomUUID();
+    this.todoes = [];
+  }
+  addToDos(todo){
+    this.todoes.push(todo);
+  }
+}
