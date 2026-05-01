@@ -10,7 +10,7 @@ export const fromLocalStorage = () => {
 }
 
 export const toLocalStoreage = (currentObj) => {
-  const store = fromLocalStorage(key);
+  const store = fromLocalStorage("key67");
   store.push(currentObj);
-  localStorage.setItem(key, JSON.stringify(store));
+  localStorage.setItem("key67", JSON.stringify(store));
 }

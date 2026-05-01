@@ -3,16 +3,48 @@ import { tasks } from "./barrel.js";
 import { el } from "./barrel.js";
 import { container } from "webpack";
 
-export const displayToggleProjectPromt = () => {
-  el.projTitlePromt.classList.toggle("hidden");
+export const displayToggleProjectPromt = (bool) => {
+  bool ? el.projTitlePromt.classList.remove("hidden") : el.projTitlePromt.classList.add("hidden");
 };
 
+export const displayToggleTodoForm = (bool) => {
+  bool ? el.projTodoForm.classList.remove("hidden") : el.projTodoForm.classList.add("hidden");
+};
+
+
+
+export const ClearprojInput = () => {
+  el.titleProject.value = "";
+  el.titleProject.focus();
+}
+
+export const ClearTodoFormInputs = () => {
+  el.titleToDo.value = "";
+  el.description.value = "";
+  el.dueDate.value = "";
+  el.priority.value = "";
+  el.checklist.checked = false;
+  el.titleToDo.focus();
+}
 export const createProjectCards = ({id = "", project = ""} = {}) => {
   const container = document.createElement("div");
   container.id = id;
+  container.classList.add("proj-class");
+
   const titleProj = document.createElement("span");
   titleProj.textContent = project;
-  container.appendChild(titleProj);
+
+  const editBtn =  document.createElement("button");
+  Object.assign(editBtn, {type : "button", name : "action", value : "edit", id : "edit-proj", textContent : "Edit"});
+
+  const deleteBtn =  document.createElement("button");
+  Object.assign(deleteBtn, {type : "button", name : "action", value : "delete", id : "delete-proj", textContent : "Delete"});
+
+  const addTodoBtn =  document.createElement("button");
+  Object.assign(addTodoBtn, {type : "button", name : "action", value : "addTodo", id : "add-todo", textContent : "Add Todo"});
+
+  container.append(titleProj, editBtn, deleteBtn, addTodoBtn);
+
   return container;
 }
 export const renderProjectCards = () => {
@@ -20,6 +52,10 @@ export const renderProjectCards = () => {
   tasks.forEach(project => {
     el.projCardsContainer.appendChild(createProjectCards(project));
   });
+};
+
+export const renderIncrementalProjCards = () => {
+  el.projCardsContainer.appendChild(createProjectCards(tasks[tasks.length - 1]));
 };
 
 export const createToDoCards = ({title = "", description = "", dueDate = "", priority = "", checklist = false, id = ""} = {}) => {
@@ -45,7 +81,10 @@ export const createToDoCards = ({title = "", description = "", dueDate = "", pri
     const editBtn =  document.createElement("button");
     Object.assign(editBtn, {type : "button", name : "action", value : "edit", id : "edit-todo", textContent : "Edit"});
 
-    container.append(titleTodo, descriptionTodo, dueDateTodo, priorityTodo, checklistTodo, editBtn);  
+    const deleteBtn =  document.createElement("button");
+    Object.assign(deleteBtn, {type : "button", name : "action", value : "delete", id : "delete-todo", textContent : "Delete"});
+
+    container.append(titleTodo, descriptionTodo, dueDateTodo, priorityTodo, checklistTodo, editBtn, deleteBtn);  
 
     return container;
 }

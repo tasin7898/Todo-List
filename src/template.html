@@ -6,9 +6,22 @@
   <title>Document</title>
 </head>
 <body>
-  <div id="todo-form">
+  <div class="create-project-button-container">
+    <button id="create-project-button" type="button" name="action" value="create">New Project</button>
+  </div>
+  <div class="project-inputField hidden">
+      <button type="button" name="action" value="clear" id="close-proj-button">X</button>
+      <label for="input-title-proj">Project: </label>
+      <input type="text" id="input-title-proj" name="input-title-proj">
+      <span id="project-error"></span>
+      
+      <button type="button" name="action" value="add" id="add-proj-button">Add</button>
+      
+    </div>
+    
+  <div id="todo-form" class="hidden">
     <form action="#" method="post" id="form">
-      <div id="close-form">X</div>
+      <button type="button" name="action" value="clear" id="close-todo-button">X</button>
       <label for="title-todo">Title: </label>
       <input id="title-todo" type="text" name="title-todo" required>
       
@@ -27,9 +40,10 @@
       </select>
       <input type="checkbox" id="checklist" name="checklist">
       <label for="checklist">Finished</label>
-      <button type="button" name="action" value="clear" id="clear-todo-button">Add</button>
+      <button type="button" name="action" value="clear" id="clear-todo-button">Clear</button>
       <button type="submit" name="action" value="add" id="add-todo-button">Add</button>
     </form>
+  </div>
     <dialog class="close-confirm">
       <div class="prompt">
         <div>You have unsaved changes. What would you like to do?</div>
@@ -37,7 +51,8 @@
       <button class="discard" type="button" value="discard">Discard</button>
       <button class="cancel" type="button" value="cancel">Cancel</button>
     </dialog>
+    <div id="proj-container"></div>
     
-  </div>
+  
 </body>
 </html>

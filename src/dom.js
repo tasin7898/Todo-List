@@ -1,3 +1,4 @@
+import { container } from "webpack";
 import { tasks } from "./barrel.js";
 import * as Controllers from "./controllers.js";
 export const el = {
@@ -7,35 +8,35 @@ export const el = {
   priority : document.getElementById("priority"),
   checklist : document.getElementById("checklist"),
 
-  titleProject : document.getElementById("title-project"),
+  titleProject : document.getElementById("input-title-proj"),
 
   createProjBtn : document.getElementById("create-project-button"),
-  createTodojBtn : document.getElementById("create-project-button"),
-  addProjBtn : document.getElementById("add-project-button"),  
+  createTodoBtn : document.getElementById("create-todo-button"),
+  addProjBtn : document.getElementById("add-proj-button"),  
   addTodoBtn : document.getElementById("add-todo-button"),
   removeProjBtn : document.getElementById("remove-project-button"),
   removeTodoBtn : document.getElementById("remove-todo-button"),
 
-  projTitlePromt : document.getElementById("project-inputField"),
+  projTitlePromt : document.querySelector(".project-inputField"),
   projCardsContainer : document.getElementById("proj-container"),
+  projectError : document.getElementById("proj-error"),
 
   projTodoContainer : document.getElementById("proj-container"),
+  projTodoForm : document.getElementById("todo-form"),
+  todoCreateBtnContainer : document.querySelector(".create-todo-button-container"),
 }
-export const form = {
+export const edited = {
   titleToDo : document.getElementById("titleEdit"),
   description: document.getElementById("desEdit"),
   dueDate : document.getElementById("dueDateEdit"),
   priority : document.getElementById("priorityEdit"),
   checklist : document.getElementById("checklistEdit"),
+
+  titleProject : document.getElementById("title-projectEdit"),
+  projectError : document.getElementById("proj-error"),
 };
 
-export const getToDoValues = (el) => ({
-  title : el.titleToDo.value.trim(),
-  description : el.description.value.trim() || "",
-  dueDate : el.dueDate.value || "",
-  priority : el.priority.value || "",
-  checklist : el.checklist.checked,
-});
+
 
 
 export const editToDoCards = ({title = "", description = "", dueDate = "", priority = "", checklist = false, id = ""} = {}) => {
@@ -46,9 +47,9 @@ export const editToDoCards = ({title = "", description = "", dueDate = "", prior
     container.id = id;
 
     const titleLabel = document.createElement("label");
-    Object.assign(titleLabel, {htmlFor : "titleEdit", textContent : "Title: "})
+    Object.assign(titleLabel, {htmlFor : "titleEdit", textContent : "Title: "});
     const titleTodo = document.createElement("input");
-    Object.assign(titleTodo, {id : "titleEdit", type : "text", name: "titleEdit", value : title}); 
+    Object.assign(titleTodo, {id : "titleEdit", type : "text", name: "titleEdit", value : title, required : true}); 
 
     const desLabel = document.createElement("label");
     Object.assign(desLabel, {htmlFor : "desEdit", textContent : "Description: "})
@@ -95,7 +96,7 @@ export const editToDoCards = ({title = "", description = "", dueDate = "", prior
     //projTodoContainer.appendChild(container);  
 };
 
-export const renderEditedCards = (projId, todoId) => {
+export const renderEditedTodoCards = (projId, todoId) => {
   const projIdx = Controllers.findIdxofProj(projId);
   const todoIdx = Controllers.findIdxofTodo(projId, todoId);
   if(projIdx === null || todoIdx === null) return null;
@@ -104,19 +105,39 @@ export const renderEditedCards = (projId, todoId) => {
   //el.projTodoContainer.replaceChild(editToDoCards(tasks[projIdx].todoes[todoIdx]), oldCard);
 };
 
-export const renderIncrementalEditedCards = (projId, todoId) => {
+export const renderIncrementalEditedTodoCards = (projId, todoId) => {
   const projIdx = Controllers.findIdxofProj(projId);
   const todoIdx = Controllers.findIdxofTodo(projId, todoId);
   if(projIdx === null || todoIdx === null) return null;
   //el.projTodoContainer.replaceChildren(editToDoCards(tasks[projIdx].todoes[todoIdx]));
   const oldCard = document.getElementById(todoId);
+  if (!oldCard) return null;
   el.projTodoContainer.replaceChild(editToDoCards(tasks[projIdx].todoes[todoIdx]), oldCard);
 };
 
-export const editProj = (projIdx) => {
-  const projIndex = Controllers.findIdxofProj(projIdx);
-  if (projIndex === null) return null;
-  const {id, project} = tasks[projIndex];
+export const editProj = ({id = "", project = ""} = {}) => {
+ 
+  const container = document.createElement("div");
+  container.id = id;
+  const titleLabel = document.createElement("label");
+  Object.assign(titleLabel, {htmlFor : "titleProjEdit", textContent : "Title: "});
+  const titleTodo = document.createElement("input");
+  Object.assign(titleTodo, {id : "titleProjEdit", type : "text", name: "titleProjEdit", value : project}); 
 
+  const cancelBtn = document.createElement("button");
+  const saveBtn =  document.createElement("button");
+  Object.assign(cancelBtn, {type : "button", name : "action", value : "cancel", id : "cancel-proj", textContent : "Cancel"});
+  Object.assign(saveBtn, {type : "button", name : "action", value : "save", id : "save-proj", textContent : "Save"});
+
+  container.append(titleLabel, titleTodo, cancelBtn, saveBtn);
+  return container;
+};
+
+export const renderEditedProjCard = (projId) => {
+  const projIndex = Controllers.findIdxofProj(projId);
+  if (projIndex === null) return null;
+  const oldCard = document.getElementById(projId);
+  if (!oldCard) return null;
+  el.projCardsContainer.replaceChild(editProj(tasks[projIndex]), oldCard)
 }
 
