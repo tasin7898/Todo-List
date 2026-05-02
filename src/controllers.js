@@ -3,8 +3,8 @@ import { tasks } from "./barrel.js";
 import { ToDO, Project } from "./models.js";
 import { el, edited } from "./dom.js";
 
-export const getProjectValues = (el) => el.titleProject.value.trim();
-export const getToDoValues = (el) => ({
+export const getProjectValues = () => el.titleProject.value.trim();
+export const getToDoValues = () => ({
   title : el.titleToDo.value.trim(),
   description : el.description.value.trim() || "",
   dueDate : el.dueDate.value || "",
@@ -12,9 +12,18 @@ export const getToDoValues = (el) => ({
   checklist : el.checklist.checked,
 });
 
-export const logToDoValues = (el) => new ToDO(getToDoValues(el));
+export const getEditedProjectValues = (editedEl) => editedEl.querySelector(".title-projectEdit").value.trim();
+export const getEditedToDoValues = (editedEl) => ({
+  title : el.querySelector(".title").value.trim(),
+  description : el.querySelector(".description").value.trim() || "",
+  dueDate : el.querySelector(".dueDate").value || "",
+  priority : el.querySelector(".priority").value || "",
+  checklist : el.querySelector(".checklist").checked,
+});
 
-export const addToDoValues = (projId) => tasks[findIdxofProj(projId)].todoes.push(logToDoValues(el));
+export const logToDoValues = () => new ToDO(getToDoValues());
+
+export const addToDoValues = (projId) => tasks[findIdxofProj(projId)].todoes.push(logToDoValues());
 
 export const findIdxofProj = (projId) => {
  const idx = tasks.findIndex(item => item.id === projId);
@@ -27,10 +36,11 @@ export const findIdxofTodo = (projId, todoId) => {
   return todoIdx === -1 ?  null : todoIdx; 
 }
 
-export const logProjectValues = (el) => new Project(getProjectValues(el));
+export const logProjectValues = () => new Project(getProjectValues());
 
+export const addProjValues = () => tasks.push(logProjectValues());
 
-export const addProjValues = () => tasks.push(logProjectValues(el));
+export const logEditedProjectValues = (editedEl) => new Project(getEditedProjectValues(editedEl));
 
 
 
@@ -40,15 +50,17 @@ export const removeProject = (projId) => {
 }
 
 export const removeToDo = (projId, todoId) => {
-  const deleteIdx = tasks[findIdxofProj(projId)].todoes.findIndex(item => item.id === todoId);
-  tasks.todoes.splice(deleteIdx, 1);
+  const projIdx = findIdxofProj(projId);
+  const todoIdx = findIdxofTodo(projId, todoId); 
+  if(projIdx === null || todoIdx === null) return null;
+  tasks[projIdx].todoes.splice(todoIdx, 1);
 }
 
-export const saveEditedToDos = (projId, todoId) => {
+export const saveEditedToDos = (projId, todoId, editedEl) => {
   const projIdx = findIdxofProj(projId);
   const todoIdx = findIdxofTodo(projId, todoId);
   if(projIdx === null || todoIdx === null) return null;
-  tasks[projIdx].todoes.splice(todoIdx, 1, logToDoValues(edited));
+  tasks[projIdx].todoes.splice(todoIdx, 1, logToDoValues(editedEl));
 };
 
 export const projTitleValidity = () => {
@@ -58,24 +70,25 @@ export const projTitleValidity = () => {
   };
 }
 
-export const projTitleEditedValidity = () => {
-  if (!getProjectValues(edited)) {
+export const projTitleEditedValidity = (editedEl) => {
+  if (!getProjectValues(editedEl)) {
   edited.projectError.textContent = "Project title is required.";
   return;
   };
   el.projectError.textContent = "";
 };
 
-export const projTitleEditValidity = () => {
-  if (!getProjectValues(edited)) {
+export const projTitleEditValidity = (editedEl) => {
+  if (!getProjectValues(editedEl)) {
   edited.projectError.textContent = "Project title is required.";
   return;
   };
   edited.projectError.textContent = "";
 }
 
-export const saveEditedProj = (projid) => {
+export const saveEditedProj = (projId, editedEl) => {
   const projIdx = findIdxofProj(projId);
   if(projIdx === null) return null;
-  tasks[projIdx].splice(projIdx, 1, logProjectValues(edited));
-}
+  tasks.splice(projIdx, 1, logEditedProjectValues(editedEl));
+};
+

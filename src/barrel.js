@@ -6,10 +6,10 @@ export * from "./ui.js";
 export * from "./localStorage.js";
 
 export const tasks = [
-  {
-    project: "default",
-    id: crypto.randomUUID(),
-    todoes: [],
-  },
+  //{
+   // project: "default",
+    //id: crypto.randomUUID(),
+    //todoes: [],
+  //},
   
 ];

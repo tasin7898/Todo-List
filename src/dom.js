@@ -1,6 +1,7 @@
 import { container } from "webpack";
 import { tasks } from "./barrel.js";
 import * as Controllers from "./controllers.js";
+import { createProjectCards } from "./barrel.js";
 export const el = {
   titleToDo : document.getElementById("title-todo"),
   description: document.getElementById("description"),
@@ -21,8 +22,9 @@ export const el = {
   projCardsContainer : document.getElementById("proj-container"),
   projectError : document.getElementById("proj-error"),
 
-  projTodoContainer : document.getElementById("proj-container"),
-  projTodoForm : document.getElementById("todo-form"),
+  todoCardsContainer : document.getElementById("todo-container"),
+  projTodoFormContainer : document.getElementById("todo-form"),
+  todoForm : document.getElementById("form"),
   todoCreateBtnContainer : document.querySelector(".create-todo-button-container"),
 }
 export const edited = {
@@ -41,59 +43,79 @@ export const edited = {
 
 export const editToDoCards = ({title = "", description = "", dueDate = "", priority = "", checklist = false, id = ""} = {}) => {
   
-  //const {id, title, description, dueDate, priority, checklist} = tasks[projIdx].todoes[todoIdx];
+  const container = document.createElement("form");
+  container.id = id;
+  container.classList.add("todo=class");
+  
+  const titleLabel = document.createElement("label");
+  Object.assign(titleLabel, { textContent : "Title: " });
 
-    const container = document.createElement("form");
-    container.id = id;
+  const titleTodo = document.createElement("input");
+  Object.assign(titleTodo, { className : "title", type : "text", name: "titleEdit", value : title, required : true });
 
-    const titleLabel = document.createElement("label");
-    Object.assign(titleLabel, {htmlFor : "titleEdit", textContent : "Title: "});
-    const titleTodo = document.createElement("input");
-    Object.assign(titleTodo, {id : "titleEdit", type : "text", name: "titleEdit", value : title, required : true}); 
+  titleLabel.appendChild(titleTodo);
 
-    const desLabel = document.createElement("label");
-    Object.assign(desLabel, {htmlFor : "desEdit", textContent : "Description: "})
-    const descriptionTodo = document.createElement("input");
-    Object.assign(descriptionTodo, {id : "desEdit", type : "text", name: "desEdit", value : description});
+  const desLabel = document.createElement("label");
+  Object.assign(desLabel, { textContent : "Description: " });
 
-    const dueDateLabel = document.createElement("label");
-    Object.assign(dueDateLabel, {htmlFor : "dueDateEdit", textContent : "Due Date: "});
-    const dueDateTodo = document.createElement("input");
-    Object.assign(dueDateTodo, {id : "dueDateEdit", type : "date", name: "dueDateEdit", value : dueDate});
+  const descriptionTodo = document.createElement("input");
+  Object.assign(descriptionTodo, { className : "description", type : "text", name: "desEdit", value : description });
 
-    const priorityLabel = document.createElement("label");
-    Object.assign(priorityLabel, {htmlFor : "priorityEdit", textContent : "Choose Priority: "});
+  desLabel.appendChild(descriptionTodo);
 
-    const priorityTodo = document.createElement("select");
-    Object.assign(priorityTodo, {id : "priorityEdit", name: "priorityEdit"});
+  const dueDateLabel = document.createElement("label");
+  Object.assign(dueDateLabel, { textContent : "Due Date: " });
 
-    const prios = ["", "low", "medium", "high"];
-    prios.forEach(prio => {
-      const option = document.createElement("option");
-      if(!prio) Object.assign(option, {selected : true, disabled : true, textContent : "Choose Priority", value : ""});
-      else {
-      Object.assign(option, {value : prio, textContent : prio[0].toUpperCase() + prio.slice(1)});
-      }
-      priorityTodo.appendChild(option);
-    });
+  const dueDateTodo = document.createElement("input");
+  Object.assign(dueDateTodo, { className : "dueDate", type : "date", name: "dueDateEdit", value : dueDate });
 
-    const checklistTodo = document.createElement("input");
-    Object.assign(checklistTodo,{type : "checkbox", id : "checklistEdit", name : "checklistEdit"});
-    const checklistLabel = document.createElement("label");
-    Object.assign(checklistLabel, {htmlFor : "checklistEdit", textContent : "Finished"});
+  dueDateLabel.appendChild(dueDateTodo);
 
-    const wrapper = document.createElement("div");
-    wrapper.classList.add("button-row");
+  const priorityLabel = document.createElement("label");
+  Object.assign(priorityLabel, { textContent : "Choose Priority: " });
 
-    const cancelBtn = document.createElement("button");
-    const saveBtn =  document.createElement("button");
-    Object.assign(cancelBtn, {type : "button", name : "action", value : "cancel", id : "cancel-todo", textContent : "Cancel"});
-    Object.assign(saveBtn, {type : "button", name : "action", value : "save", id : "save-todo", textContent : "Save"});
-    wrapper.append(cancelBtn, saveBtn);
+  const priorityTodo = document.createElement("select");
+  Object.assign(priorityTodo, { className : "priority", name: "priorityEdit" });
 
-    container.append(titleLabel, titleTodo, desLabel, descriptionTodo, dueDateLabel, dueDateTodo, priorityLabel, priorityTodo, checklistTodo, checklistLabel, wrapper);
-    return container;
-    //projTodoContainer.appendChild(container);  
+  const prios = ["", "low", "medium", "high"];
+  prios.forEach(prio => {
+    const option = document.createElement("option");
+    if(!prio) Object.assign(option, {selected : true, disabled : true, textContent : "Choose Priority", value : ""});
+    else Object.assign(option, {value : prio, textContent : prio[0].toUpperCase() + prio.slice(1)});
+    priorityTodo.appendChild(option);
+  });
+
+  priorityLabel.appendChild(priorityTodo);
+
+  const checklistLabel = document.createElement("label");
+  Object.assign(checklistLabel, { textContent : "Finished" });
+
+  const checklistTodo = document.createElement("input");
+  Object.assign(checklistTodo,{ className : "checklist", type : "checkbox", name : "checklistEdit" });
+
+  checklistLabel.appendChild(checklistTodo);
+
+  const wrapper = document.createElement("div");
+  wrapper.classList.add("button-row");
+
+  const cancelBtn = document.createElement("button");
+  const saveBtn =  document.createElement("button");
+
+  Object.assign(cancelBtn, {type : "button", name : "action", value : "cancel", className : "cancel-todo", textContent : "Cancel"});
+  Object.assign(saveBtn, {type : "button", name : "action", value : "save", className : "save-todo", textContent : "Save"});
+
+  wrapper.append(cancelBtn, saveBtn);
+
+  container.append(
+    titleLabel, 
+    desLabel, 
+    dueDateLabel, 
+    priorityLabel, 
+    checklistLabel, 
+    wrapper
+  );
+
+  return container;
 };
 
 export const renderEditedTodoCards = (projId, todoId) => {
@@ -119,17 +141,23 @@ export const editProj = ({id = "", project = ""} = {}) => {
  
   const container = document.createElement("div");
   container.id = id;
+  container.classList.add("proj-class");
+
   const titleLabel = document.createElement("label");
-  Object.assign(titleLabel, {htmlFor : "titleProjEdit", textContent : "Title: "});
-  const titleTodo = document.createElement("input");
-  Object.assign(titleTodo, {id : "titleProjEdit", type : "text", name: "titleProjEdit", value : project}); 
+  Object.assign(titleLabel, { textContent : "Title: " });
+
+  const title = document.createElement("input");
+  Object.assign(title, { className : "title-projectEdit", type : "text", name: "title-projectEdit", value : project });
+
+  titleLabel.appendChild(title);
 
   const cancelBtn = document.createElement("button");
   const saveBtn =  document.createElement("button");
-  Object.assign(cancelBtn, {type : "button", name : "action", value : "cancel", id : "cancel-proj", textContent : "Cancel"});
-  Object.assign(saveBtn, {type : "button", name : "action", value : "save", id : "save-proj", textContent : "Save"});
 
-  container.append(titleLabel, titleTodo, cancelBtn, saveBtn);
+  Object.assign(cancelBtn, {type : "button", name : "action", value : "cancel", className : "cancel-proj", textContent : "Cancel"});
+  Object.assign(saveBtn, {type : "button", name : "action", value : "save", className : "save-proj", textContent : "Save"});
+
+  container.append(titleLabel, cancelBtn, saveBtn);
   return container;
 };
 
@@ -141,3 +169,17 @@ export const renderEditedProjCard = (projId) => {
   el.projCardsContainer.replaceChild(editProj(tasks[projIndex]), oldCard)
 }
 
+export const renderBackProjCard = (projId) => {
+  const projIndex = Controllers.findIdxofProj(projId);
+  if (projIndex === null) return null;
+  const oldCard = document.getElementById(projId);
+  if (!oldCard) return null;
+  el.projCardsContainer.replaceChild(createProjectCards(tasks[projIndex]), oldCard);
+  
+}
+
+export const renderSavedProjCard = (projidx, projId) => {
+  const oldCard = document.getElementById(projId);
+  if (!oldCard) return null;
+  el.projCardsContainer.replaceChild(createProjectCards(tasks[projidx]), oldCard);
+}
