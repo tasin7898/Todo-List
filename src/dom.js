@@ -26,6 +26,8 @@ export const el = {
   projTodoFormContainer : document.getElementById("todo-form"),
   todoForm : document.getElementById("form"),
   todoCreateBtnContainer : document.querySelector(".create-todo-button-container"),
+
+  dialogFormConfirm : document.querySelector(".close-confirm"),
 }
 export const edited = {
   titleToDo : document.getElementById("titleEdit"),

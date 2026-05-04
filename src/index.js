@@ -1,5 +1,5 @@
 import "./styles.css";
-import {tasks, toLocalStorage, el, edited, form, displayToggleProjectPromt, addProjValues, fromLocalStorage, logProjectValues, displayToggleTodoForm, displayToggleTodoCreateBtn, ClearTodoFormInputs, renderIncrementalProjCards, removeProject, renderProjectCards, renderEditedProjCard, saveEditedProj, createProjectCards, findIdxofProj, renderIncrementalToDoCard, addToDoValues, removeToDo, renderToDoCards, saveEditedToDos, renderEditableTodoCard, renderEditedTodoCard, findIdxofTodo, renderEditableProjCard, ClearProjInput, getProjectValues, defaultProj} from "./barrel.js"
+import {tasks, toLocalStorage, el, edited, form, displayToggleProjectPromt, addProjValues, fromLocalStorage, logProjectValues, displayToggleTodoForm, displayToggleTodoCreateBtn, ClearTodoFormInputs, renderIncrementalProjCards, removeProject, renderProjectCards, renderEditedProjCard, saveEditedProj, createProjectCards, findIdxofProj, renderIncrementalToDoCard, addToDoValues, removeToDo, renderToDoCards, saveEditedToDos, renderEditableTodoCard, renderEditedTodoCard, findIdxofTodo, renderEditableProjCard, ClearProjInput, getProjectValues, defaultProj, getToDoValues, getEditedToDoValues} from "./barrel.js"
 
 (function init (){
   //console.log(fromLocalStorage());
@@ -12,19 +12,41 @@ import {tasks, toLocalStorage, el, edited, form, displayToggleProjectPromt, addP
   renderProjectCards();
 })();
 
+const state = {
+  editingProjId : null,
+  editingTodoId : null,
+};
+
+const outsideClickHandlers = {
+  proj : null,
+  todo : null,
+}
 
 el.createProjBtn.addEventListener("click", (e) => {
-  e.stopPropagation();
+  //e.stopPropagation();
   displayToggleProjectPromt(true);
   
 });
 
-document.addEventListener("click", ()=> {
-   displayToggleProjectPromt(false);
-   ClearProjInput();
+document.addEventListener("click", (e) => {
+  const target = e.target;
+  const exclusions = [el.createProjBtn, el.projTitlePromt, el.projTodoFormContainer, el.dialogFormConfirm]
+  if(exclusions.some(zone => zone.contains(target))) return;
+  if(getProjectValues()){
+    addProjValues();
+    toLocalStorage(tasks);
+    renderIncrementalProjCards();
+    ClearProjInput();
+    }
+  displayToggleProjectPromt(false);
+  if(!el.projTodoFormContainer.classList.contains("hidden"))[...Object.values(getToDoValues())].some(Boolean) ? el.dialogFormConfirm.showModal() : displayToggleTodoForm(false);
+  
+  
+  
+   //ClearProjInput();
 })
 el.projTitlePromt.addEventListener("click", (e) => {
-  e.stopPropagation();
+  //e.stopPropagation();
   const button = e.target.closest("button");
   if(!button) return;
   if(button.id === "close-proj-button"){
@@ -44,23 +66,10 @@ el.projTitlePromt.addEventListener("click", (e) => {
     ClearProjInput();
     }
 })
-el.addProjBtn.addEventListener("click", (e) => {
-  if(!getProjectValues()) {
-    alert("Project must have a title!");
-    return;
-  }
-  displayToggleProjectPromt(false);
-  //displayToggleTodoCreateBtn(true);
-  addProjValues();
-  toLocalStorage(tasks);
-  renderIncrementalProjCards();
-  ClearProjInput();
-  
-});
 
 
 el.projCardsContainer.addEventListener("click", (e) => {
-
+  e.stopPropagation();
   const projEl = e.target.closest(".proj-class");
   if (!projEl) return;
   //console.log(projEl);
@@ -79,9 +88,11 @@ el.projCardsContainer.addEventListener("click", (e) => {
   
 
     if(button.classList.contains("add-todo")){
+      
       el.projTodoFormContainer.dataset.projId = projId;
+      console.log(projId, tasks)
       displayToggleTodoForm(true);
-      ClearTodoFormInputs();
+      //ClearTodoFormInputs();
     }
     if(button.classList.contains("delete-proj")){
       removeProject(projId);
@@ -90,16 +101,56 @@ el.projCardsContainer.addEventListener("click", (e) => {
       //renderProjectCards();
     }
     if(button.classList.contains("edit-proj")){
+      renderEditableProjCard(projId);
       
+     /* if(state.editingProjId && state.editingProjId !== projId){
+        saveEditedProj(state.editingProjId, document.getElementById(state.editingProjId));
+        toLocalStorage(tasks);
+        renderEditedProjCard(state.editingProjId);
+      } */
+     
+      
+      
+      if(outsideClickHandlers.proj) {
+        document.removeEventListener("click", outsideClickHandlers.proj);
+        outsideClickHandlers.proj();
+      };
+
+      outsideClickHandlers.proj = () => {
+        const projEl =  document.getElementById(projId);
+        if(!projEl) return;
+        const inputEl = projEl.querySelector(".title-projectEdit") ;
+        const projInputField = inputEl?.value.trim();
+       
+        if(!projInputField){
+          renderEditedProjCard(projId);
+        }
+        else {
+          saveEditedProj(projId, projEl);
+          toLocalStorage(tasks);
+          renderEditedProjCard(projId);
+          ClearProjInput();
+        }
+        document.removeEventListener("click", outsideClickHandlers.proj);
+        outsideClickHandlers.proj = null;
+      }
+
+      
+        document.addEventListener("click", outsideClickHandlers.proj);
+        
+      
+      //document.addEventListener("click", outsideClickHandlers.proj);
+      //state.editingProjId = projId;
       //saveEditedProj(projId);
       //renderEditedProjCard(projId);
-      renderEditableProjCard(projId);
+      
       //console.log(document.getElementById("title-projectEdit"));
       //console.log(edited.titleProject);
     }   
     if(button.classList.contains("cancel-proj")){
             //displayToggleTodoForm(true);
-      renderBackProjCard(projId);
+      renderEditedProjCard(projId);
+      outsideClickHandlers.proj = null;
     }
     if(button.classList.contains("save-proj")){
             //displayToggleTodoForm(true);
@@ -108,8 +159,9 @@ el.projCardsContainer.addEventListener("click", (e) => {
       toLocalStorage(tasks);
       renderEditedProjCard(projId);
       ClearProjInput();
-      console.log(tasks);
-      console.log(projId);
+      outsideClickHandlers.proj = null;
+      //console.log(tasks);
+      //console.log(projId);
       //console.log(findIdxofProj(projId));
       //console.log(createProjectCards(tasks[findIdxofProj(projId)]));
     }
@@ -129,14 +181,28 @@ el.projCardsContainer.addEventListener("click", (e) => {
       //console.log(document.getElementById(todoId), tasks, projId);
       
       renderEditableTodoCard(projId, todoId, projEl);
+      outsideClickHandlers.todo = () => {
+        const todoEl = document.getElementById(todoId);
+        if(!todoEl) return;
+        if([...Object.values(getEditedToDoValues(todoEl, undefined))].some(Boolean)){
+          el.dialogFormConfirm.showModal();
+        }
+        else renderEditedTodoCard(projId, todoId, projEl);
+        document.removeEventListener("click", outsideClickHandlers.todo);
+        outsideClickHandlers.todo = null;
+      }
+      document.addEventListener("click", outsideClickHandlers.todo);
+
     }
     if(button.classList.contains("cancel-todo")){
       renderEditedTodoCard(projId, todoId, projEl);
+      outsideClickHandlers.todo = null;
     }
     if(button.classList.contains("save-todo")){
       saveEditedToDos(projId, todoId, todoEl);
       toLocalStorage(tasks);
       renderEditedTodoCard(projId, todoId, projEl);
+      outsideClickHandlers.todo = null;
       //ClearTodoFormInputs();
     }
       
@@ -145,21 +211,46 @@ el.projCardsContainer.addEventListener("click", (e) => {
   
   //displayToggleTodoForm(true);
 })
+el.projTodoFormContainer.addEventListener("click", (e) => {
+  //e.stopPropagation();
+  const button = e.target.closest("button");
+  if(!button) return;
+  if(button.id === "close-todo-button"){
+    if([...Object.values(getToDoValues())].some(Boolean)){
+    el.dialogFormConfirm.showModal();
+    }
+    else displayToggleTodoForm(false);
+  }
+  if(button.id === "clear-todo-button"){
+    ClearProjInput();
+  }
+  if(button.id === "add-todo-button"){
+    e.preventDefault();
+    if(!el.todoForm.checkValidity()) return;
+    const projId = el.projTodoFormContainer.dataset.projId;
+    const projEl = document.getElementById(projId);
 
-el.addTodoBtn.addEventListener("click", (e) => {
-  if(!el.todoForm.checkValidity()) return;
-  e.preventDefault();
-  const projId = el.projTodoFormContainer.dataset.projId;
-  const projEl = document.getElementById(projId);
-  //console.log(projId);
-  //const projidx = findIdxofProj(projId);
-  addToDoValues(projId);
-  toLocalStorage(tasks);
-  renderIncrementalToDoCard(projId, projEl);
-  displayToggleTodoForm(false);
-});
+    addToDoValues(projId);
+    toLocalStorage(tasks);
+    renderIncrementalToDoCard(projId, projEl);
+    displayToggleTodoForm(false);
+  }
+})
 
 
+el.dialogFormConfirm.addEventListener("click", (e) => {
+  //e.stopPropagation();
+  const button = e.target.closest("button");
+  if(!button) return;
+  if(button.id === "dialog-cancel"){
+    el.dialogFormConfirm.close();
+  }
+  if(button.id === "dialog-discard"){
+    el.dialogFormConfirm.close();
+    ClearTodoFormInputs();
+    displayToggleTodoForm(false);
+  }
+})
 //el.todoCardsContainer.addEventListener("click", (e) => {
  // const button = e.target.closest("button");
 //})

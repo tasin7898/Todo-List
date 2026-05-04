@@ -23,7 +23,7 @@ export const getEditedToDoValues = (editedEl, oldTodo) => ({
   dueDate : editedEl.querySelector(".dueDate").value || "",
   priority : editedEl.querySelector(".priority").value || "",
   checklist : editedEl.querySelector(".checklist").checked,
-  id : oldTodo.id,
+  id : oldTodo?.id,
 });
 
 export const logToDoValues = () => new ToDO(getToDoValues());
