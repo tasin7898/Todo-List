@@ -24,3 +24,9 @@ export class Project {
     this.todoes.push(todo);
   }
 }
+
+export const defaultProj = {
+  project : "Default",
+  id : "default6767",
+  todoes : [],
+}

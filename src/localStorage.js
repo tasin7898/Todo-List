@@ -1,7 +1,7 @@
 
 export const fromLocalStorage = () => {
   try {
-   const raw = localStorage.getItem();
+   const raw = localStorage.getItem("key67");
    return raw? JSON.parse(raw) : [];
   }
   catch {
@@ -9,8 +9,7 @@ export const fromLocalStorage = () => {
   }
 }
 
-export const toLocalStoreage = (currentObj) => {
-  const store = fromLocalStorage("key67");
-  store.push(currentObj);
-  localStorage.setItem("key67", JSON.stringify(store));
+export const toLocalStorage = (tasksArr) => {
+  
+  localStorage.setItem("key67", JSON.stringify(tasksArr));
 }

@@ -13,7 +13,7 @@ export const displayToggleTodoForm = (bool) => {
 
 
 
-export const ClearprojInput = () => {
+export const ClearProjInput = () => {
   el.titleProject.value = "";
   el.titleProject.focus();
 }
@@ -43,20 +43,17 @@ export const createProjectCards = ({id = "", project = ""} = {}) => {
   const addTodoBtn =  document.createElement("button");
   Object.assign(addTodoBtn, {type : "button", name : "action", value : "addTodo", className : "add-todo", textContent : "Add Todo"});
 
-  container.append(titleProj, editBtn, deleteBtn, addTodoBtn);
+  const wrapper = document.createElement("div");
+  wrapper.classList.add("todo-container-wrapper");
+  const todoContainer = document.createElement("div");
+  todoContainer.classList.add("todo-container");
+  wrapper.appendChild(todoContainer);
+
+  container.append(titleProj, editBtn, deleteBtn, addTodoBtn, wrapper);
 
   return container;
 }
-export const renderProjectCards = () => {
-  el.projCardsContainer.innerHTML = "";
-  tasks.forEach(project => {
-    el.projCardsContainer.appendChild(createProjectCards(project));
-  });
-};
 
-export const renderIncrementalProjCards = () => {
-  el.projCardsContainer.appendChild(createProjectCards(tasks[tasks.length - 1]));
-};
 
 export const createToDoCards = ({title = "", description = "", dueDate = "", priority = "", checklist = false, id = ""} = {}) => {
     const container = document.createElement("div");
@@ -77,6 +74,7 @@ export const createToDoCards = ({title = "", description = "", dueDate = "", pri
     priorityTodo.textContent = priority;
 
     const checklistTodo = document.createElement("p");
+    checklistTodo.classList.add("checklist");
     checklistTodo.textContent = checklist ? "Finished" : "Not Finished";
 
     const editBtn =  document.createElement("button");
@@ -89,18 +87,37 @@ export const createToDoCards = ({title = "", description = "", dueDate = "", pri
 
     return container;
 }
-export const renderToDoCards = (projId) => {
-  const projIdx = Controllers.findIdxofProj(projId)
-  if(projIdx === null) return null;
-  el.todoCardsContainer.innerHTML = "";
-  tasks[projIdx].todoes.forEach(todo => {
-    el.todoCardsContainer.appendChild(createToDoCards(todo));
+export const renderProjectCards = () => {
+  el.projCardsContainer.innerHTML = "";
+  tasks.forEach(project => {
+    const currentProj = createProjectCards(project);
+    const todoContainer = currentProj.querySelector(".todo-container")
+    el.projCardsContainer.appendChild(currentProj);
+    project.todoes?.forEach(todo => {
+      todoContainer.appendChild(createToDoCards(todo));
+    });
   });
 };
 
-export const renderIncrementalToDoCard = (projId) => {
+export const renderIncrementalProjCards = () => {
+  el.projCardsContainer.appendChild(createProjectCards(tasks[tasks.length - 1]));
+};
+
+export const renderToDoCards = (projId, projEl) => {
+  const projIdx = Controllers.findIdxofProj(projId)
+  if(projIdx === null) return null;
+  const todoContainer = projEl.querySelector(".todo-container");
+  todoContainer.innerHTML = "";
+  tasks[projIdx].todoes.forEach(todo => {
+    todoContainer.appendChild(createToDoCards(todo));
+  });
+};
+
+export const renderIncrementalToDoCard = (projId, projEl) => {
   const projIdx = Controllers.findIdxofProj(projId);
   if(projIdx === null) return null;
   const newCard = tasks[projIdx].todoes[tasks[projIdx].todoes.length - 1];
-  el.todoCardsContainer.appendChild(createToDoCards(newCard));
+
+  projEl.querySelector(".todo-container").appendChild(createToDoCards(newCard));
+  
 }

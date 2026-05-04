@@ -12,18 +12,23 @@ export const getToDoValues = () => ({
   checklist : el.checklist.checked,
 });
 
-export const getEditedProjectValues = (editedEl) => editedEl.querySelector(".title-projectEdit").value.trim();
-export const getEditedToDoValues = (editedEl) => ({
-  title : el.querySelector(".title").value.trim(),
-  description : el.querySelector(".description").value.trim() || "",
-  dueDate : el.querySelector(".dueDate").value || "",
-  priority : el.querySelector(".priority").value || "",
-  checklist : el.querySelector(".checklist").checked,
+export const getEditedProjectValues = (editedEl, oldProj) => ({
+  project : editedEl.querySelector(".title-projectEdit").value.trim(),
+  id : oldProj.id,
+  todoes : oldProj.todoes,
+})
+export const getEditedToDoValues = (editedEl, oldTodo) => ({
+  title : editedEl.querySelector(".title").value.trim(),
+  description : editedEl.querySelector(".description").value.trim() || "",
+  dueDate : editedEl.querySelector(".dueDate").value || "",
+  priority : editedEl.querySelector(".priority").value || "",
+  checklist : editedEl.querySelector(".checklist").checked,
+  id : oldTodo.id,
 });
 
 export const logToDoValues = () => new ToDO(getToDoValues());
 
-export const addToDoValues = (projId) => tasks[findIdxofProj(projId)].todoes.push(logToDoValues());
+export const addToDoValues = (projId) => tasks[findIdxofProj(projId)].todoes?.push(logToDoValues());
 
 export const findIdxofProj = (projId) => {
  const idx = tasks.findIndex(item => item.id === projId);
@@ -40,7 +45,7 @@ export const logProjectValues = () => new Project(getProjectValues());
 
 export const addProjValues = () => tasks.push(logProjectValues());
 
-export const logEditedProjectValues = (editedEl) => new Project(getEditedProjectValues(editedEl));
+//export const logEditedProjectValues = (editedEl) => new Project(getEditedProjectValues(editedEl));
 
 
 
@@ -56,11 +61,19 @@ export const removeToDo = (projId, todoId) => {
   tasks[projIdx].todoes.splice(todoIdx, 1);
 }
 
+export const saveEditedProj = (projId, editedEl) => {
+  const projIdx = findIdxofProj(projId);
+  if(projIdx === null) return null;
+  const oldProj = tasks[projIdx];
+  tasks.splice(projIdx, 1, getEditedProjectValues(editedEl, oldProj));
+};
+
 export const saveEditedToDos = (projId, todoId, editedEl) => {
   const projIdx = findIdxofProj(projId);
   const todoIdx = findIdxofTodo(projId, todoId);
   if(projIdx === null || todoIdx === null) return null;
-  tasks[projIdx].todoes.splice(todoIdx, 1, logToDoValues(editedEl));
+  const oldTodo = tasks[projIdx].todoes[todoIdx];
+  tasks[projIdx].todoes.splice(todoIdx, 1, getEditedToDoValues(editedEl, oldTodo));
 };
 
 export const projTitleValidity = () => {
@@ -86,9 +99,5 @@ export const projTitleEditValidity = (editedEl) => {
   edited.projectError.textContent = "";
 }
 
-export const saveEditedProj = (projId, editedEl) => {
-  const projIdx = findIdxofProj(projId);
-  if(projIdx === null) return null;
-  tasks.splice(projIdx, 1, logEditedProjectValues(editedEl));
-};
+
 

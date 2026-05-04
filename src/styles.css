@@ -16,3 +16,12 @@ body {
   flex-direction: column;
   gap: 2rem;
 }
+
+.todo-class {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.fade-out {
+  opacity: 0;
+  transform: scale(0.95);
+}

@@ -1,7 +1,7 @@
 import { container } from "webpack";
 import { tasks } from "./barrel.js";
 import * as Controllers from "./controllers.js";
-import { createProjectCards } from "./barrel.js";
+import { createProjectCards, createToDoCards } from "./barrel.js";
 export const el = {
   titleToDo : document.getElementById("title-todo"),
   description: document.getElementById("description"),
@@ -17,7 +17,7 @@ export const el = {
   addTodoBtn : document.getElementById("add-todo-button"),
   removeProjBtn : document.getElementById("remove-project-button"),
   removeTodoBtn : document.getElementById("remove-todo-button"),
-
+  closeProjInputBtn : document.getElementById("close-proj-button"),
   projTitlePromt : document.querySelector(".project-inputField"),
   projCardsContainer : document.getElementById("proj-container"),
   projectError : document.getElementById("proj-error"),
@@ -41,11 +41,11 @@ export const edited = {
 
 
 
-export const editToDoCards = ({title = "", description = "", dueDate = "", priority = "", checklist = false, id = ""} = {}) => {
+export const editToDoCards = ({title = "", description = "", dueDate = "", priority = "", checklist = false, id = ""} = {}, checklistFlag) => {
   
   const container = document.createElement("form");
   container.id = id;
-  container.classList.add("todo=class");
+  container.classList.add("todo-class");
   
   const titleLabel = document.createElement("label");
   Object.assign(titleLabel, { textContent : "Title: " });
@@ -64,7 +64,7 @@ export const editToDoCards = ({title = "", description = "", dueDate = "", prior
   desLabel.appendChild(descriptionTodo);
 
   const dueDateLabel = document.createElement("label");
-  Object.assign(dueDateLabel, { textContent : "Due Date: " });
+  Object.assign(dueDateLabel, { textContent : "Due Date: "});
 
   const dueDateTodo = document.createElement("input");
   Object.assign(dueDateTodo, { className : "dueDate", type : "date", name: "dueDateEdit", value : dueDate });
@@ -91,7 +91,7 @@ export const editToDoCards = ({title = "", description = "", dueDate = "", prior
   Object.assign(checklistLabel, { textContent : "Finished" });
 
   const checklistTodo = document.createElement("input");
-  Object.assign(checklistTodo,{ className : "checklist", type : "checkbox", name : "checklistEdit" });
+  Object.assign(checklistTodo,{ className : "checklist", type : "checkbox", name : "checklistEdit", checked : checklistFlag || false });
 
   checklistLabel.appendChild(checklistTodo);
 
@@ -118,24 +118,9 @@ export const editToDoCards = ({title = "", description = "", dueDate = "", prior
   return container;
 };
 
-export const renderEditedTodoCards = (projId, todoId) => {
-  const projIdx = Controllers.findIdxofProj(projId);
-  const todoIdx = Controllers.findIdxofTodo(projId, todoId);
-  if(projIdx === null || todoIdx === null) return null;
-  el.projTodoContainer.replaceChildren(editToDoCards(tasks[projIdx].todoes[todoIdx]));
-  //const oldCard = document.getElementById(todoId);
-  //el.projTodoContainer.replaceChild(editToDoCards(tasks[projIdx].todoes[todoIdx]), oldCard);
-};
 
-export const renderIncrementalEditedTodoCards = (projId, todoId) => {
-  const projIdx = Controllers.findIdxofProj(projId);
-  const todoIdx = Controllers.findIdxofTodo(projId, todoId);
-  if(projIdx === null || todoIdx === null) return null;
-  //el.projTodoContainer.replaceChildren(editToDoCards(tasks[projIdx].todoes[todoIdx]));
-  const oldCard = document.getElementById(todoId);
-  if (!oldCard) return null;
-  el.projTodoContainer.replaceChild(editToDoCards(tasks[projIdx].todoes[todoIdx]), oldCard);
-};
+
+
 
 export const editProj = ({id = "", project = ""} = {}) => {
  
@@ -161,7 +146,7 @@ export const editProj = ({id = "", project = ""} = {}) => {
   return container;
 };
 
-export const renderEditedProjCard = (projId) => {
+export const renderEditableProjCard = (projId) => {
   const projIndex = Controllers.findIdxofProj(projId);
   if (projIndex === null) return null;
   const oldCard = document.getElementById(projId);
@@ -169,7 +154,7 @@ export const renderEditedProjCard = (projId) => {
   el.projCardsContainer.replaceChild(editProj(tasks[projIndex]), oldCard)
 }
 
-export const renderBackProjCard = (projId) => {
+export const renderEditedProjCard = (projId) => {
   const projIndex = Controllers.findIdxofProj(projId);
   if (projIndex === null) return null;
   const oldCard = document.getElementById(projId);
@@ -178,8 +163,28 @@ export const renderBackProjCard = (projId) => {
   
 }
 
-export const renderSavedProjCard = (projidx, projId) => {
+/*export const renderEditedProjCard = (projidx, projId) => {
   const oldCard = document.getElementById(projId);
-  if (!oldCard) return null;
+  if (!oldCard || projidx === null) return null;
   el.projCardsContainer.replaceChild(createProjectCards(tasks[projidx]), oldCard);
+}*/
+
+export const renderEditableTodoCard = (projId, todoId, projEl) => {
+  const projIndex = Controllers.findIdxofProj(projId);
+  const todoIndex = Controllers.findIdxofTodo(projId, todoId);
+  if (projIndex === null || todoIndex === null) return null;
+  const oldCard = document.getElementById(todoId);
+  if(!oldCard) return null;
+  const checklistFlag = oldCard.querySelector(".checklist").textContent === "Finished";
+  projEl.querySelector(".todo-container").replaceChild(editToDoCards(tasks[projIndex].todoes[todoIndex], checklistFlag), oldCard);
 }
+
+export const renderEditedTodoCard = (projId, todoId, projEl) => {
+  const projIndex = Controllers.findIdxofProj(projId);
+  const todoIndex = Controllers.findIdxofTodo(projId, todoId);
+  if (projIndex === null || todoIndex === null) return null;
+  const oldCard = document.getElementById(todoId);
+  if(!oldCard) return null;
+  projEl.querySelector(".todo-container").replaceChild(createToDoCards(tasks[projIndex].todoes[todoIndex]), oldCard);
+}
+
