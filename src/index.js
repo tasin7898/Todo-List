@@ -14,14 +14,14 @@ import {tasks, toLocalStorage, el, edited, form, displayToggleProjectPromt, addP
 
 const state = {
   editingProjId : null,
-  editingTodoId : null,
+  editingTodo : {projId : null, todoId : null},
   skipProjEdit : false,
+  skipTodoEdit : false,
+  addTodoProjId : null,
+  
 };
 
-const outsideClickHandlers = {
-  proj : null,
-  todo : null,
-}
+
 const outsideProjClickHandler = (target) => {
   const projId = state.editingProjId;
   if(!projId) return;
@@ -44,49 +44,122 @@ const outsideProjClickHandler = (target) => {
   }
    state.editingProjId = null;
 };
-const outSideProjFormHandler = () => {
-  //if(el.projTitlePromt.classList.contains("hidden")) return;
-  if(getProjectValues()){
-    addProjValues();
-    toLocalStorage(tasks);
-    renderIncrementalProjCards(); 
-    ClearProjInput(); }
+const OutsideTodoEditClickHandler = (target) => {
+  const { projId, todoId } = state.editingTodo;
+  if (!projId || !todoId) return;
+
+  const projEl = document.getElementById(projId);
+  const todoEl = document.getElementById(todoId);
+
+  if (!projEl || !todoEl) {
+    state.editingTodo.projId = null;
+    state.editingTodo.todoId = null;
+    return;
+  }
+  
+  if(todoEl.contains(target)) return;
+  const hasInputs = [...Object.values(getEditedToDoValues(todoEl, undefined))].some(Boolean);
+  if(hasInputs){
+    console.log(getEditedToDoValues(todoEl, undefined));
+    el.dialogFormConfirm.dataset.projId = projId;
+    el.dialogFormConfirm.dataset.todoId = todoId;
+    el.dialogFormConfirm.showModal();
+  }
+  else renderEditedTodoCard(projId, todoId, projEl);
+  state.editingTodo.projId = null;
+  state.editingTodo.todoId = null;
 }
-el.createProjBtn.addEventListener("click", (e) => {
-  //e.stopPropagation();
-  displayToggleProjectPromt(true);
+const outSideProjFormHandler = (target) => {
+  //if(el.projTitlePromt.classList.contains("hidden")) return;
+  const projFormOpen = !el.projTitlePromt.classList.contains("hidden");
+  //console.log(el.projTitlePromt, target);
+  //console.log(el.projTitlePromt.contains(target));
+  if(projFormOpen){
+    const clickInside = el.projTitlePromt.contains(target);
+    if(clickInside) return;
+    if(getProjectValues()){
+      addProjValues();
+      toLocalStorage(tasks);
+      renderIncrementalProjCards(); 
+      ClearProjInput(); 
+    }
+    displayToggleProjectPromt(false);
+  }
+}
+const outSideTodoFormhandler = (target, isAddTodoBtn) => {
+  const todoFormOpen = !el.projTodoFormContainer.classList.contains("hidden");
+  
+  if(!todoFormOpen) return;
+  if(isAddTodoBtn) return;
+  const clickInside = el.projTodoFormContainer.contains(target);
+  if(clickInside) return;
+  const hasInput = [...Object.values(getToDoValues())].some(Boolean);
+  if(hasInput){
+    el.dialogFormConfirm.showModal();
+    return;
+  }
+  displayToggleTodoForm(false);
+
+}
+
+const outsideCreateProjBtnHandler = (target) => {
+  const clickInside = el.createProjBtn.contains(target);
+  if(clickInside) return;
+ // displayToggleProjectPromt(false);
+}
+
+const unsavedTodoFormGaurd = (newProjId, newTodoId) => {
+  const {projId, todoId} = state.editingTodo;
+  if(!projId || !todoId) return false;
+  if(projId === newProjId && todoId === newTodoId) return false;
+  const todoEl = document.getElementById(todoId);
+  if(!todoEl) return false;
+  const hasinputs = [...Object.values(getEditedToDoValues(todoEl, undefined))].some(Boolean);
+  if(hasinputs){
+    el.dialogFormConfirm.dataset.projId = projId;
+    el.dialogFormConfirm.dataset.todoId = todoId;
+    el.dialogFormConfirm.showModal();
+    return true;
+  }
+  const projEl = document.getElementById(projId);
+  if (projEl) renderEditedTodoCard(projId, todoId, projEl);
+  state.editingTodo.projId = null;
+  state.editingTodo.todoId = null;
+}
+document.addEventListener("click", (e) => {
+  const target = e.target;
+  const button = e.target.closest("button");
+  const isAddTodoBtn = button?.classList.contains("add-todo");
+  //if(isAddTodoBtn) return;
+  outSideProjFormHandler(target);
+  outSideTodoFormhandler(target, isAddTodoBtn);
+  if (state.skipProjEdit) {
+    state.skipProjEdit = false;  
+  }
+  else {
+  outsideProjClickHandler(target);
+  }
+  if(state.skipTodoEdit){
+    state.skipTodoEdit = false;
+  }
+  else {
+  OutsideTodoEditClickHandler(target);
+  }
+  
+  outSideProjFormHandler(target);
+  //if(el.createProjBtn) return;
+  
+  if (el.createProjBtn.contains(target)) {
+    if(unsavedTodoFormGaurd(null, null)) return;
+    console.log("gg")
+    displayToggleProjectPromt(true);
+    
+  }
+  //outsideCreateProjBtnHandler(target);
+  
   
 });
 
-document.addEventListener("click", (e) => {
-  const target = e.target;
-
-  if (state.skipProjEdit) {
-    state.skipProjEdit = false;
-    return;
-  }
-
-  const exclusions = [
-    el.createProjBtn,
-    el.projTitlePromt,
-    el.projTodoFormContainer,
-    el.dialogFormConfirm
-  ];
-
-  if (exclusions.some(zone => zone.contains(target))) return;
-
-  displayToggleProjectPromt(false);
-
-  if (!el.projTodoFormContainer.classList.contains("hidden") &&!el.projTodoFormContainer.contains(target)) {
-    [...Object.values(getToDoValues())].some(Boolean)
-      ? el.dialogFormConfirm.showModal()
-      : displayToggleTodoForm(false);
-  }
-
-  outSideProjFormHandler();
-
-  outsideProjClickHandler(target);
-});
 el.projTitlePromt.addEventListener("click", (e) => {
   //e.stopPropagation();
   const button = e.target.closest("button");
@@ -129,128 +202,151 @@ el.projCardsContainer.addEventListener("click", (e) => {
   const todoId = todoEl?.id;
   
 
-    if(button.classList.contains("add-todo")){
-      state.skipProjEdit = true;
-      el.projTodoFormContainer.dataset.projId = projId;
-      
-      console.log(projId, tasks)
-      displayToggleTodoForm(true);
+  if(button.classList.contains("add-todo")){
+    //state.skipTodoForm = true;
+    const editingProj = !!state.editingProjId;
+    const editingTodo = !!state.editingTodo.projId && !!state.editingTodo.todoId;
+    const formDirty = !el.projTodoFormContainer.classList.contains("hidden") && [...Object.values(getToDoValues())].some(Boolean);
+
+  if (editingProj || editingTodo || formDirty) return;
+
+  el.projTodoFormContainer.dataset.projId = projId;
+  
+  console.log(projId, tasks)
+  displayToggleTodoForm(true);
+  if(state.addTodoProjId  && state.addTodoProjId !== projId) {
+    if([...Object.values(getToDoValues())].some(Boolean)){
+    el.dialogFormConfirm.showModal();
+    }
+    else displayToggleTodoForm(false);
+  }
+  state.addTodoProjId = projId;
       //ClearTodoFormInputs();
-    }
-    if(button.classList.contains("delete-proj")){
-      removeProject(projId);
+  }
+  if(button.classList.contains("delete-proj")){
+    if(unsavedTodoFormGaurd(null, null)) return;
+    removeProject(projId);
+    toLocalStorage(tasks);
+    projEl.remove()
+    //renderProjectCards();
+  }
+  if(button.classList.contains("edit-proj")){
+    if(unsavedTodoFormGaurd(null, null)) return;
+    state.skipProjEdit = true;
+    renderEditableProjCard(projId);
+    console.log("hi");
+    
+    if(state.editingProjId && state.editingProjId !== projId){
+      saveEditedProj(state.editingProjId, document.getElementById(state.editingProjId));
       toLocalStorage(tasks);
-      projEl.remove()
-      //renderProjectCards();
-    }
-    if(button.classList.contains("edit-proj")){
-      state.editingProjId = projId;
-      state.skipProjEdit = true;
-      renderEditableProjCard(projId);
-      console.log("hi");
+      renderEditedProjCard(state.editingProjId);
+    } 
+    state.editingProjId = projId;
+    
+    
+    /*if(outsideClickHandlers.proj) {
+      document.removeEventListener("click", outsideClickHandlers.proj);
+      outsideClickHandlers.proj();
+    };
+
+    outsideClickHandlers.proj = () => {
+      const projEl =  document.getElementById(projId);
+      if(!projEl) return;
+      const inputEl = projEl.querySelector(".title-projectEdit") ;
+      const projInputField = inputEl?.value.trim();
       
-     /* if(state.editingProjId && state.editingProjId !== projId){
-        saveEditedProj(state.editingProjId, document.getElementById(state.editingProjId));
+      if(!projInputField){
+        renderEditedProjCard(projId);
+      }
+      else {
+        saveEditedProj(projId, projEl);
         toLocalStorage(tasks);
-        renderEditedProjCard(state.editingProjId);
-      } */
-     
-      
-      
-      /*if(outsideClickHandlers.proj) {
-        document.removeEventListener("click", outsideClickHandlers.proj);
-        outsideClickHandlers.proj();
-      };
-
-      outsideClickHandlers.proj = () => {
-        const projEl =  document.getElementById(projId);
-        if(!projEl) return;
-        const inputEl = projEl.querySelector(".title-projectEdit") ;
-        const projInputField = inputEl?.value.trim();
-       
-        if(!projInputField){
-          renderEditedProjCard(projId);
-        }
-        else {
-          saveEditedProj(projId, projEl);
-          toLocalStorage(tasks);
-          renderEditedProjCard(projId);
-          ClearProjInput();
-        }
-        document.removeEventListener("click", outsideClickHandlers.proj);
-        outsideClickHandlers.proj = null;
+        renderEditedProjCard(projId);
+        ClearProjInput();
       }
+      document.removeEventListener("click", outsideClickHandlers.proj);
+      outsideClickHandlers.proj = null;
+    }
 
+    
+      document.addEventListener("click", outsideClickHandlers.proj); */
       
-        document.addEventListener("click", outsideClickHandlers.proj); */
-        
-      
-      //document.addEventListener("click", outsideClickHandlers.proj);
-      //state.editingProjId = projId;
-      //saveEditedProj(projId);
-      //renderEditedProjCard(projId);
-      
-      //console.log(document.getElementById("title-projectEdit"));
-      //console.log(edited.titleProject);
-    }   
-    if(button.classList.contains("cancel-proj")){
-            //displayToggleTodoForm(true);
-      renderEditedProjCard(projId);
-       state.editingProjId = null;
-    }
-    if(button.classList.contains("save-proj")){
-            //displayToggleTodoForm(true);
-      //renderBackProjCard(projId);
-      saveEditedProj(projId, projEl);
-      toLocalStorage(tasks);
-      renderEditedProjCard(projId);
-      ClearProjInput();
-       state.editingProjId = null;
-      //console.log(tasks);
-      //console.log(projId);
-      //console.log(findIdxofProj(projId));
-      //console.log(createProjectCards(tasks[findIdxofProj(projId)]));
-    }
-     if(button.classList.contains("delete-todo")){
-      removeToDo(projId, todoId);
-      toLocalStorage(tasks);
-      todoEl.classList.add("fade-out");
-      todoEl.addEventListener("transitionend", () => todoEl.remove(), { once: true });
-      //console.log(tasks);
-      //console.log(tasks);
-      //console.log(projId, todoId);
-      //console.log(todoEl);
-      //renderToDoCards(projId, projEl);
-    }
-    if(button.classList.contains("edit-todo")){
-      //saveEditedToDos(projId, todoId, todoEl);
-      //console.log(document.getElementById(todoId), tasks, projId);
-      
-      renderEditableTodoCard(projId, todoId, projEl);
-      /*outsideClickHandlers.todo = () => {
-        const todoEl = document.getElementById(todoId);
-        if(!todoEl) return;
-        if([...Object.values(getEditedToDoValues(todoEl, undefined))].some(Boolean)){
-          el.dialogFormConfirm.showModal();
-        }
-        else renderEditedTodoCard(projId, todoId, projEl);
-        document.removeEventListener("click", outsideClickHandlers.todo);
-        outsideClickHandlers.todo = null;
+    
+    //document.addEventListener("click", outsideClickHandlers.proj);
+    //state.editingProjId = projId;
+    //saveEditedProj(projId);
+    //renderEditedProjCard(projId);
+    
+    //console.log(document.getElementById("title-projectEdit"));
+    //console.log(edited.titleProject);
+  }   
+  if(button.classList.contains("cancel-proj")){
+          //displayToggleTodoForm(true);
+    renderEditedProjCard(projId);
+      state.editingProjId = null;
+  }
+  if(button.classList.contains("save-proj")){
+          //displayToggleTodoForm(true);
+    //renderBackProjCard(projId);
+    saveEditedProj(projId, projEl);
+    toLocalStorage(tasks);
+    renderEditedProjCard(projId);
+    ClearProjInput();
+      state.editingProjId = null;
+    //console.log(tasks);
+    //console.log(projId);
+    //console.log(findIdxofProj(projId));
+    //console.log(createProjectCards(tasks[findIdxofProj(projId)]));
+  }
+    if(button.classList.contains("delete-todo")){
+    if(unsavedTodoFormGaurd(null, null)) return;
+    removeToDo(projId, todoId);
+    toLocalStorage(tasks);
+    todoEl.classList.add("fade-out");
+    todoEl.addEventListener("transitionend", () => todoEl.remove(), { once: true });
+    //console.log(tasks);
+    //console.log(tasks);
+    //console.log(projId, todoId);
+    //console.log(todoEl);
+    //renderToDoCards(projId, projEl);
+  }
+  if(button.classList.contains("edit-todo")){
+    //saveEditedToDos(projId, todoId, todoEl);
+    //console.log(document.getElementById(todoId), tasks, projId);
+    if (unsavedTodoFormGaurd(projId, todoId)) return;
+    state.skipTodoEdit = true;
+
+    renderEditableTodoCard(projId, todoId, projEl);
+
+    state.editingTodo.projId = projId;
+    state.editingTodo.todoId = todoId;
+    /*outsideClickHandlers.todo = () => {
+      const todoEl = document.getElementById(todoId);
+      if(!todoEl) return;
+      if([...Object.values(getEditedToDoValues(todoEl, undefined))].some(Boolean)){
+        el.dialogFormConfirm.showModal();
       }
-      document.addEventListener("click", outsideClickHandlers.todo);*/
+      else renderEditedTodoCard(projId, todoId, projEl);
+      document.removeEventListener("click", outsideClickHandlers.todo);
+      outsideClickHandlers.todo = null;
+    }
+    document.addEventListener("click", outsideClickHandlers.todo);*/
 
-    }
-    if(button.classList.contains("cancel-todo")){
-      renderEditedTodoCard(projId, todoId, projEl);
-      state.editingTodoId = null;
-    }
-    if(button.classList.contains("save-todo")){
-      saveEditedToDos(projId, todoId, todoEl);
-      toLocalStorage(tasks);
-      renderEditedTodoCard(projId, todoId, projEl);
-      state.editingTodoId = null;
-      //ClearTodoFormInputs();
-    }
+  }
+  if(button.classList.contains("cancel-todo")){
+    renderEditedTodoCard(projId, todoId, projEl);
+    state.editingTodo.projId = null;
+    state.editingTodo.todoId = null;
+  }
+  if(button.classList.contains("save-todo")){
+    saveEditedToDos(projId, todoId, todoEl);
+    toLocalStorage(tasks);
+    renderEditedTodoCard(projId, todoId, projEl);
+    state.editingTodoId = null;
+    state.editingTodo.projId = null;
+    state.editingTodo.todoId = null;
+    //ClearTodoFormInputs();
+  }
       
       //renderProjectCards();
     
@@ -280,18 +376,28 @@ el.projTodoFormContainer.addEventListener("click", (e) => {
     toLocalStorage(tasks);
     renderIncrementalToDoCard(projId, projEl);
     displayToggleTodoForm(false);
+    
   }
 })
 
 
 el.dialogFormConfirm.addEventListener("click", (e) => {
-  //e.stopPropagation();
+  e.stopPropagation();
   const button = e.target.closest("button");
   if(!button) return;
+  const projId = el.dialogFormConfirm.dataset.projId;
+  const todoId = el.dialogFormConfirm.dataset.todoId;
   if(button.id === "dialog-cancel"){
     el.dialogFormConfirm.close();
+    console.log("lol");
+    state.editingTodo.projId = projId;
+    state.editingTodo.todoId = todoId;
   }
   if(button.id === "dialog-discard"){
+    
+    const projEl = document.getElementById(projId);
+    renderEditedTodoCard(projId, todoId, projEl);
+    console.log(projId, projEl, todoId);
     el.dialogFormConfirm.close();
     ClearTodoFormInputs();
     displayToggleTodoForm(false);

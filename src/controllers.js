@@ -18,11 +18,11 @@ export const getEditedProjectValues = (editedEl, oldProj) => ({
   todoes : oldProj.todoes,
 })
 export const getEditedToDoValues = (editedEl, oldTodo) => ({
-  title : editedEl.querySelector(".title").value.trim(),
-  description : editedEl.querySelector(".description").value.trim() || "",
-  dueDate : editedEl.querySelector(".dueDate").value || "",
-  priority : editedEl.querySelector(".priority").value || "",
-  checklist : editedEl.querySelector(".checklist").checked,
+  title : editedEl.querySelector(".title")?.value.trim(),
+  description : editedEl.querySelector(".description")?.value.trim() || "",
+  dueDate : editedEl.querySelector(".dueDate")?.value || "",
+  priority : editedEl.querySelector(".priority")?.value || "",
+  checklist : editedEl.querySelector(".checklist")?.checked,
   id : oldTodo?.id,
 });
 
