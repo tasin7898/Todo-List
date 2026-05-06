@@ -220,7 +220,8 @@ el.projCardsContainer.addEventListener("click", (e) => {
     if(unsavedTodoFormGaurd(null, null)) return;
     removeProject(projId);
     toLocalStorage(tasks);
-    projEl.remove()
+    projEl.classList.add("fade-out");
+    projEl.addEventListener("transitionend", () => projEl.remove(), { once: true });
     //renderProjectCards();
   }
   if(button.classList.contains("edit-proj")){
@@ -285,7 +286,7 @@ el.projCardsContainer.addEventListener("click", (e) => {
     toLocalStorage(tasks);
     renderEditedProjCard(projId);
     ClearProjInput();
-      state.editingProjId = null;
+    state.editingProjId = null;
     //console.log(tasks);
     //console.log(projId);
     //console.log(findIdxofProj(projId));
@@ -359,7 +360,7 @@ el.projTodoFormContainer.addEventListener("click", (e) => {
     else displayToggleTodoForm(false);
   }
   if(button.id === "clear-todo-button"){
-    ClearProjInput();
+    ClearTodoFormInputs();
   }
   if(button.id === "add-todo-button"){
     if(!el.todoForm.checkValidity()) return;
@@ -401,3 +402,19 @@ el.dialogFormConfirm.addEventListener("click", (e) => {
 //el.todoCardsContainer.addEventListener("click", (e) => {
  // const button = e.target.closest("button");
 //})
+
+el.projTitlePromt.addEventListener("keydown", (e) => {
+
+  if(e.key !== "Enter") return;
+  if(!e.target.matches("#input-title-proj")) return;
+  el.addProjBtn?.click();
+});
+
+el.projCardsContainer.addEventListener("keydown", (e) => {
+  if(e.key !== "Enter") return;
+  const input = e.target.closest(".title-projectEdit");
+  if (!input) return;
+
+  const projEl = input.closest(".proj-class");
+  projEl?.querySelector(".save-proj")?.click();
+})

@@ -51,7 +51,7 @@ export const editToDoCards = ({title = "", description = "", dueDate = "", prior
   
   //const titleWrapper = document.createElement("div");
   const titleLabel = document.createElement("label");
-  Object.assign(titleLabel, { textContent : "Title: " });
+  Object.assign(titleLabel, { textContent : "Title: ", className : "todo-titles" });
 
   const titleTodo = document.createElement("input");
   Object.assign(titleTodo, { className : "title", type : "text", name: "titleEdit", value : title, required : true , maxLength : 15});
@@ -99,7 +99,7 @@ export const editToDoCards = ({title = "", description = "", dueDate = "", prior
   checklistLabel.appendChild(checklistTodo);
 
   const wrapper = document.createElement("div");
-  wrapper.classList.add("button-row");
+  wrapper.classList.add("btn-wrapper");
 
   const cancelBtn = document.createElement("button");
   const saveBtn =  document.createElement("button");
@@ -153,21 +153,21 @@ export const editProj = ({id = "", project = ""} = {}) => {
   return container;
 };
 
-export const renderEditableProjCard = (projId) => {
+/*export const renderEditableProjCard = (projId) => {
   const projIndex = Controllers.findIdxofProj(projId);
   if (projIndex === null) return null;
   const oldCard = document.getElementById(projId);
   if (!oldCard) return null;
   el.projCardsContainer.replaceChild(editProj(tasks[projIndex]), oldCard)
-}
+}*/
 
-export const renderEditedProjCard = (projId) => {
+/*export const renderEditedProjCard = (projId) => {
   const projIndex = Controllers.findIdxofProj(projId);
   if (projIndex === null) return null;
   const oldCard = document.getElementById(projId);
   if (!oldCard) return null;
   el.projCardsContainer.replaceChild(createProjectCards(tasks[projIndex]), oldCard);
-}
+}*/
 
 /*export const renderEditedProjCard = (projidx, projId) => {
   const oldCard = document.getElementById(projId);
@@ -194,3 +194,59 @@ export const renderEditedTodoCard = (projId, todoId, projEl) => {
   projEl.querySelector(".todo-container").replaceChild(createToDoCards(tasks[projIndex].todoes[todoIndex]), oldCard);
 }
 
+export const renderEditableProjCard = (projId) => {
+  const projEl = document.getElementById(projId);
+  if(!projEl) return;
+
+  const titleEl = projEl.querySelector(".proj-title");
+  const btnWrapper = projEl.querySelector(".btn-wrapper");
+
+  const titleLabel = document.createElement("label");
+  Object.assign(titleLabel, { textContent : "Title: ", className : "proj-title" });
+
+  const title = document.createElement("input");
+  Object.assign(title, { className : "title-projectEdit", type : "text", name: "title-projectEdit", value : titleEl.textContent });
+
+  titleLabel.appendChild(title);
+
+  projEl.replaceChild(titleLabel, titleEl);
+
+  btnWrapper.innerHTML = "";
+  const cancelBtn = document.createElement("button");
+  const saveBtn =  document.createElement("button");
+
+  Object.assign(cancelBtn, {type : "button", name : "action", value : "cancel", className : "cancel-proj", textContent : "❌"});
+  Object.assign(saveBtn, {type : "button", name : "action", value : "save", className : "save-proj", textContent : "💾"});
+
+  btnWrapper.append(saveBtn, cancelBtn);
+
+};
+
+export const renderEditedProjCard = (projId) => {
+  const projIndex = Controllers.findIdxofProj(projId);
+  if (projIndex === null) return null;
+
+  const projEl = document.getElementById(projId);
+  if(!projEl) return;
+  const titleLabel = projEl.querySelector(".proj-title");
+  const titleInput = projEl.querySelector(".title-projectEdit");
+  const btnWrapper = projEl.querySelector(".btn-wrapper");
+
+  const title = document.createElement("span");
+  title.textContent = titleInput.value;
+  title.classList.add("proj-title");
+
+  projEl.replaceChild(title, titleLabel);
+
+  btnWrapper.innerHTML = "";
+  const editBtn =  document.createElement("button");
+  Object.assign(editBtn, {type : "button", name : "action", value : "edit", className : "edit-proj", textContent : "✏️"});
+
+  const deleteBtn =  document.createElement("button");
+  Object.assign(deleteBtn, {type : "button", name : "action", value : "delete", className : "delete-proj", textContent : "🗑️"});
+
+  const addTodoBtn =  document.createElement("button");
+  Object.assign(addTodoBtn, {type : "button", name : "action", value : "addTodo", className : "add-todo", textContent : " ➕ Add Todo"});
+
+  btnWrapper.append(editBtn, deleteBtn, addTodoBtn);
+}

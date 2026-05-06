@@ -32,6 +32,7 @@ export const createProjectCards = ({id = "", project = ""} = {}) => {
   container.classList.add("proj-class");
 
   const titleProj = document.createElement("span");
+  titleProj.classList.add("proj-title");
   titleProj.textContent = project;
 
   const editBtn =  document.createElement("button");
@@ -85,7 +86,7 @@ export const createToDoCards = ({title = "", description = "", dueDate = "", pri
 
     const btnWrapper = document.createElement("div");
     btnWrapper.classList.add("btn-wrapper");
-    
+
     const editBtn =  document.createElement("button");
     Object.assign(editBtn, {type : "button", name : "action", value : "edit", className : "edit-todo", textContent : "✏️"});
 
