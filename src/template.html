@@ -10,7 +10,7 @@
     <button id="create-project-button" type="button" name="action" value="create">New Project</button>
   </div>
   <div class="project-inputField hidden">
-      <button type="button" name="action" value="clear" id="close-proj-button">X</button>
+      <button type="button" name="action" value="clear" id="close-proj-button">❌</button>
       <label for="input-title-proj">Project: </label>
       <input type="text" id="input-title-proj" name="input-title-proj">
       <span id="project-error"></span>
@@ -23,10 +23,10 @@
     <form action="#" id="form">
       <button type="button" name="action" value="clear" id="close-todo-button">X</button>
       <label for="title-todo">Title: </label>
-      <input id="title-todo" type="text" name="title-todo" required>
+      <input id="title-todo" type="text" name="title-todo" maxlength="15" required>
       
       <label for="description">Description: </label>
-      <input type="text" id="description" name="description">
+      <input type="text" id="description" name="description" maxlength="50">
 
       <label for="due-date">Due Date: </label>
       <input type="date" id="due-date" name="due-date">

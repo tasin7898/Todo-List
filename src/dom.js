@@ -49,11 +49,12 @@ export const editToDoCards = ({title = "", description = "", dueDate = "", prior
   container.id = id;
   container.classList.add("todo-class");
   
+  //const titleWrapper = document.createElement("div");
   const titleLabel = document.createElement("label");
   Object.assign(titleLabel, { textContent : "Title: " });
 
   const titleTodo = document.createElement("input");
-  Object.assign(titleTodo, { className : "title", type : "text", name: "titleEdit", value : title, required : true });
+  Object.assign(titleTodo, { className : "title", type : "text", name: "titleEdit", value : title, required : true , maxLength : 15});
 
   titleLabel.appendChild(titleTodo);
 
@@ -61,7 +62,7 @@ export const editToDoCards = ({title = "", description = "", dueDate = "", prior
   Object.assign(desLabel, { textContent : "Description: " });
 
   const descriptionTodo = document.createElement("input");
-  Object.assign(descriptionTodo, { className : "description", type : "text", name: "desEdit", value : description });
+  Object.assign(descriptionTodo, { className : "description", type : "text", name: "desEdit", value : description, maxLength : 50});
 
   desLabel.appendChild(descriptionTodo);
 
@@ -104,7 +105,7 @@ export const editToDoCards = ({title = "", description = "", dueDate = "", prior
   const saveBtn =  document.createElement("button");
 
   Object.assign(cancelBtn, {type : "button", name : "action", value : "cancel", className : "cancel-todo", textContent : "Cancel"});
-  Object.assign(saveBtn, {type : "button", name : "action", value : "save", className : "save-todo", textContent : "Save"});
+  Object.assign(saveBtn, {type : "submit", name : "action", value : "save", className : "save-todo", textContent : "Save"});
 
   wrapper.append(cancelBtn, saveBtn);
 
@@ -144,7 +145,11 @@ export const editProj = ({id = "", project = ""} = {}) => {
   Object.assign(cancelBtn, {type : "button", name : "action", value : "cancel", className : "cancel-proj", textContent : "Cancel"});
   Object.assign(saveBtn, {type : "button", name : "action", value : "save", className : "save-proj", textContent : "Save"});
 
-  container.append(titleLabel, cancelBtn, saveBtn);
+  const btnWrapper = document.createElement("div");
+  btnWrapper.classList.add("btn-wrapper");
+  btnWrapper.append(saveBtn, cancelBtn);
+
+  container.append(titleLabel, btnWrapper);
   return container;
 };
 
@@ -162,7 +167,6 @@ export const renderEditedProjCard = (projId) => {
   const oldCard = document.getElementById(projId);
   if (!oldCard) return null;
   el.projCardsContainer.replaceChild(createProjectCards(tasks[projIndex]), oldCard);
-  
 }
 
 /*export const renderEditedProjCard = (projidx, projId) => {

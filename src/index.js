@@ -17,7 +17,6 @@ const state = {
   editingTodo : {projId : null, todoId : null},
   skipProjEdit : false,
   skipTodoEdit : false,
-  addTodoProjId : null,
   
 };
 
@@ -146,7 +145,7 @@ document.addEventListener("click", (e) => {
   OutsideTodoEditClickHandler(target);
   }
   
-  outSideProjFormHandler(target);
+
   //if(el.createProjBtn) return;
   
   if (el.createProjBtn.contains(target)) {
@@ -212,15 +211,9 @@ el.projCardsContainer.addEventListener("click", (e) => {
 
   el.projTodoFormContainer.dataset.projId = projId;
   
-  console.log(projId, tasks)
+  //console.log(projId, tasks)
   displayToggleTodoForm(true);
-  if(state.addTodoProjId  && state.addTodoProjId !== projId) {
-    if([...Object.values(getToDoValues())].some(Boolean)){
-    el.dialogFormConfirm.showModal();
-    }
-    else displayToggleTodoForm(false);
-  }
-  state.addTodoProjId = projId;
+  
       //ClearTodoFormInputs();
   }
   if(button.classList.contains("delete-proj")){
@@ -339,10 +332,12 @@ el.projCardsContainer.addEventListener("click", (e) => {
     state.editingTodo.todoId = null;
   }
   if(button.classList.contains("save-todo")){
+    //e.preventDefault();
+    if(!todoEl.checkValidity()) return;
+    e.preventDefault();
     saveEditedToDos(projId, todoId, todoEl);
     toLocalStorage(tasks);
     renderEditedTodoCard(projId, todoId, projEl);
-    state.editingTodoId = null;
     state.editingTodo.projId = null;
     state.editingTodo.todoId = null;
     //ClearTodoFormInputs();
@@ -367,8 +362,8 @@ el.projTodoFormContainer.addEventListener("click", (e) => {
     ClearProjInput();
   }
   if(button.id === "add-todo-button"){
-    e.preventDefault();
     if(!el.todoForm.checkValidity()) return;
+    e.preventDefault();
     const projId = el.projTodoFormContainer.dataset.projId;
     const projEl = document.getElementById(projId);
 

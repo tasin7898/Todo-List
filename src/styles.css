@@ -1,5 +1,6 @@
 * {
   box-sizing: border-box;
+  border-radius: .7rem;;
 }
 
 .hidden {
@@ -26,3 +27,67 @@ body {
   transform: scale(0.95);
 }
 
+#proj-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem;;
+}
+#proj-container > div {
+  background-color: antiquewhite;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem;
+}
+input {
+  border: 1px solid gray;
+  padding: .3rem;
+}
+button {
+  border-radius: .5rem;
+  border: none;
+  padding: .5rem .9rem;
+  background-color: yellow;
+  margin-top: .4rem;
+}
+button:hover {
+  background-color: orange;
+}
+.btn-wrapper {
+  align-self: center;
+  display: flex;
+  gap: .5rem;
+  
+}
+.todo-class {
+ padding: .8rem;;
+ display: flex;
+ flex-direction: column;
+ gap: .8rem;
+}
+.todo-container {
+  display: flex;
+  gap: 1.2rem;
+  align-items: stretch;
+}
+
+.todo-container > div {
+  background-color: skyblue;
+  padding-top: 1.5rem;
+
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: .4rem;
+  flex: 1 0 220px;
+  min-height: 150px;
+  overflow: auto;
+}
+
+.todo-titles {
+  font-size: 1.1rem;
+  font-weight: 600;
+}

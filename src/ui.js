@@ -35,21 +35,27 @@ export const createProjectCards = ({id = "", project = ""} = {}) => {
   titleProj.textContent = project;
 
   const editBtn =  document.createElement("button");
-  Object.assign(editBtn, {type : "button", name : "action", value : "edit", className : "edit-proj", textContent : "Edit"});
+  Object.assign(editBtn, {type : "button", name : "action", value : "edit", className : "edit-proj", textContent : "✏️"});
 
   const deleteBtn =  document.createElement("button");
-  Object.assign(deleteBtn, {type : "button", name : "action", value : "delete", className : "delete-proj", textContent : "Delete"});
+  Object.assign(deleteBtn, {type : "button", name : "action", value : "delete", className : "delete-proj", textContent : "🗑️"});
 
   const addTodoBtn =  document.createElement("button");
-  Object.assign(addTodoBtn, {type : "button", name : "action", value : "addTodo", className : "add-todo", textContent : "Add Todo"});
+  Object.assign(addTodoBtn, {type : "button", name : "action", value : "addTodo", className : "add-todo", textContent : " ➕ Add Todo"});
 
+  const btnWrapper = document.createElement("div");
+
+  btnWrapper.append(editBtn, deleteBtn, addTodoBtn);
+  btnWrapper.classList.add("btn-wrapper");
   const wrapper = document.createElement("div");
   wrapper.classList.add("todo-container-wrapper");
+
   const todoContainer = document.createElement("div");
   todoContainer.classList.add("todo-container");
+
   wrapper.appendChild(todoContainer);
 
-  container.append(titleProj, editBtn, deleteBtn, addTodoBtn, wrapper);
+  container.append(titleProj, btnWrapper, wrapper);
 
   return container;
 }
@@ -62,28 +68,32 @@ export const createToDoCards = ({title = "", description = "", dueDate = "", pri
    
     const titleTodo = document.createElement("div");
     titleTodo.classList.add("todo-titles");
-    titleTodo.textContent = title;
+    titleTodo.textContent = "Title: " + title;
 
     const descriptionTodo = document.createElement("p");
-    descriptionTodo.textContent = description;
+    descriptionTodo.textContent = "Description: " + description;
 
     const dueDateTodo = document.createElement("p");
-    dueDateTodo.textContent = dueDate;
+    dueDateTodo.textContent = "Due Date: " + dueDate;
 
     const priorityTodo = document.createElement("p");
-    priorityTodo.textContent = priority;
+    priorityTodo.textContent = "Priority: " + priority;
 
     const checklistTodo = document.createElement("p");
     checklistTodo.classList.add("checklist");
     checklistTodo.textContent = checklist ? "Finished" : "Not Finished";
 
+    const btnWrapper = document.createElement("div");
+    btnWrapper.classList.add("btn-wrapper");
+    
     const editBtn =  document.createElement("button");
-    Object.assign(editBtn, {type : "button", name : "action", value : "edit", className : "edit-todo", textContent : "Edit"});
+    Object.assign(editBtn, {type : "button", name : "action", value : "edit", className : "edit-todo", textContent : "✏️"});
 
     const deleteBtn =  document.createElement("button");
-    Object.assign(deleteBtn, {type : "button", name : "action", value : "delete", className : "delete-todo", textContent : "Delete"});
+    Object.assign(deleteBtn, {type : "button", name : "action", value : "delete", className : "delete-todo", textContent : "🗑️"});
 
-    container.append( titleTodo, descriptionTodo, dueDateTodo, priorityTodo, checklistTodo, editBtn, deleteBtn);  
+    btnWrapper.append(editBtn, deleteBtn);
+    container.append( titleTodo, descriptionTodo, dueDateTodo, priorityTodo, checklistTodo, btnWrapper);  
 
     return container;
 }
