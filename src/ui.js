@@ -2,13 +2,13 @@ import * as Controllers from "./controllers.js";
 import { tasks } from "./barrel.js";
 import { el } from "./barrel.js";
 import { container } from "webpack";
-
+import { format } from "date-fns";
 export const displayToggleProjectPromt = (bool) => {
   bool ? el.projTitlePromt.classList.remove("hidden") : el.projTitlePromt.classList.add("hidden");
 };
 
 export const displayToggleTodoForm = (bool) => {
-  bool ? el.projTodoFormContainer.classList.remove("hidden") : el.projTodoFormContainer.classList.add("hidden");
+  bool ? el.projTodoFormContainer.classList.add("open") : el.projTodoFormContainer.classList.remove("open");
 };
 
 
@@ -66,16 +66,23 @@ export const createToDoCards = ({title = "", description = "", dueDate = "", pri
     const container = document.createElement("div");
     container.id = id;
     container.classList.add("todo-class");
-   
+    container.classList.remove("low", "medium", "high");
+
+    if(priority) container.classList.add(priority.toLowerCase());
+
     const titleTodo = document.createElement("div");
     titleTodo.classList.add("todo-titles");
     titleTodo.textContent = "Title: " + title;
+
+    const todoDetail = document.createElement("div");
+    todoDetail.classList.add("todo-details");
 
     const descriptionTodo = document.createElement("p");
     descriptionTodo.textContent = "Description: " + description;
 
     const dueDateTodo = document.createElement("p");
-    dueDateTodo.textContent = "Due Date: " + dueDate;
+    dueDateTodo.textContent = dueDate
+    ? "Due Date: " + format(new Date(dueDate), "d MMM, yyyy") : "Due Date: ";
 
     const priorityTodo = document.createElement("p");
     priorityTodo.textContent = "Priority: " + priority;
@@ -94,7 +101,8 @@ export const createToDoCards = ({title = "", description = "", dueDate = "", pri
     Object.assign(deleteBtn, {type : "button", name : "action", value : "delete", className : "delete-todo", textContent : "🗑️"});
 
     btnWrapper.append(editBtn, deleteBtn);
-    container.append( titleTodo, descriptionTodo, dueDateTodo, priorityTodo, checklistTodo, btnWrapper);  
+    todoDetail.append(descriptionTodo, dueDateTodo, priorityTodo, checklistTodo, btnWrapper)
+    container.append( titleTodo, todoDetail);  
 
     return container;
 }
@@ -132,3 +140,4 @@ export const renderIncrementalToDoCard = (projId, projEl) => {
   projEl.querySelector(".todo-container").appendChild(createToDoCards(newCard));
   
 }
+

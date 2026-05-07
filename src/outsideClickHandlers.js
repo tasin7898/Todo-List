@@ -100,3 +100,11 @@ const unsavedTodoFormGaurd = (newProjId, newTodoId) => {
   state.editingTodo.projId = null;
   state.editingTodo.todoId = null;
 }
+
+const projEl = target.closest(".proj-class");
+  if (!projEl) return;
+  const projId = projEl.id;
+  const todoEl = target.closest(".todo-class");
+  if(!todoEl) return;
+  const todoId = todoEl.id;
+  if (unsavedTodoFormGaurd(projId, todoId)) return;

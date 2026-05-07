@@ -17,7 +17,7 @@ const state = {
   editingTodo : {projId : null, todoId : null},
   skipProjEdit : false,
   skipTodoEdit : false,
-  
+  expandTodo : { todoId : null },
 };
 
 
@@ -125,6 +125,39 @@ const unsavedTodoFormGaurd = (newProjId, newTodoId) => {
   state.editingTodo.projId = null;
   state.editingTodo.todoId = null;
 }
+
+const todoExpandHandler = (target) => {
+  //if(unsavedTodoFormGaurd(null, null)) return;
+  //if(state.editingTodo.projId && state.editingTodo.todoId) return;
+  const todoEl = target.closest(".todo-class");
+  if(!todoEl) return;
+  const todoId = todoEl?.id; 
+  if(state.expandTodo.todoId && state.expandTodo.todoId !== todoId){
+    const previousTodoEl = document.getElementById(state.expandTodo.todoId);
+    if(previousTodoEl) {
+    previousTodoEl.classList.remove("expand");
+    }
+  }
+  state.expandTodo.todoId = todoId;
+  
+  todoEl.classList.add("expand");
+  console.log("koko", todoEl)
+}
+
+const todoExpandOutsideClickHandler = (target) => {
+  
+  if(!state.expandTodo.todoId) return;
+  const todoEl = document.getElementById(state.expandTodo.todoId);
+  if(!todoEl) {
+    state.expandTodo.todoId = null;
+    return;
+  }
+  if(todoEl.contains(target)) return;
+  //console.log("nooooooo")
+ 
+  todoEl.classList.remove("expand");
+  state.expandTodo.todoId = null;
+}
 document.addEventListener("click", (e) => {
   const target = e.target;
   const button = e.target.closest("button");
@@ -132,6 +165,28 @@ document.addEventListener("click", (e) => {
   //if(isAddTodoBtn) return;
   outSideProjFormHandler(target);
   outSideTodoFormhandler(target, isAddTodoBtn);
+ 
+  
+
+  //if(el.createProjBtn) return;
+  
+  if (el.createProjBtn.contains(target)) {
+    if(unsavedTodoFormGaurd(null, null)) return;
+    const formDirty = !el.projTodoFormContainer.classList.contains("hidden") && [...Object.values(getToDoValues())].some(Boolean);
+    if(formDirty) return;
+    console.log("gg")
+    displayToggleProjectPromt(true);
+    
+  }
+  const isEditingTodo = state.editingTodo.projId && state.editingTodo.todoId;
+  const formDirty = !el.projTodoFormContainer.classList.contains("hidden") && [...Object.values(getToDoValues())].some(Boolean);
+    
+  if(!isEditingTodo && !formDirty) {
+  todoExpandOutsideClickHandler(target);
+  todoExpandHandler(target);
+  }
+  //outsideCreateProjBtnHandler(target);
+  
   if (state.skipProjEdit) {
     state.skipProjEdit = false;  
   }
@@ -144,18 +199,6 @@ document.addEventListener("click", (e) => {
   else {
   OutsideTodoEditClickHandler(target);
   }
-  
-
-  //if(el.createProjBtn) return;
-  
-  if (el.createProjBtn.contains(target)) {
-    if(unsavedTodoFormGaurd(null, null)) return;
-    console.log("gg")
-    displayToggleProjectPromt(true);
-    
-  }
-  //outsideCreateProjBtnHandler(target);
-  
   
 });
 
@@ -201,6 +244,7 @@ el.projCardsContainer.addEventListener("click", (e) => {
   const todoId = todoEl?.id;
   
 
+
   if(button.classList.contains("add-todo")){
     //state.skipTodoForm = true;
     const editingProj = !!state.editingProjId;
@@ -213,11 +257,13 @@ el.projCardsContainer.addEventListener("click", (e) => {
   
   //console.log(projId, tasks)
   displayToggleTodoForm(true);
-  
+  ClearTodoFormInputs();
       //ClearTodoFormInputs();
   }
   if(button.classList.contains("delete-proj")){
     if(unsavedTodoFormGaurd(null, null)) return;
+    const formDirty = !el.projTodoFormContainer.classList.contains("hidden") && [...Object.values(getToDoValues())].some(Boolean);
+    if(formDirty) return;
     removeProject(projId);
     toLocalStorage(tasks);
     projEl.classList.add("fade-out");
@@ -226,6 +272,8 @@ el.projCardsContainer.addEventListener("click", (e) => {
   }
   if(button.classList.contains("edit-proj")){
     if(unsavedTodoFormGaurd(null, null)) return;
+    const formDirty = !el.projTodoFormContainer.classList.contains("hidden") && [...Object.values(getToDoValues())].some(Boolean);
+    if(formDirty) return;
     state.skipProjEdit = true;
     renderEditableProjCard(projId);
     console.log("hi");
@@ -292,7 +340,8 @@ el.projCardsContainer.addEventListener("click", (e) => {
     //console.log(findIdxofProj(projId));
     //console.log(createProjectCards(tasks[findIdxofProj(projId)]));
   }
-    if(button.classList.contains("delete-todo")){
+  
+  if(button.classList.contains("delete-todo")){
     if(unsavedTodoFormGaurd(null, null)) return;
     removeToDo(projId, todoId);
     toLocalStorage(tasks);
@@ -308,6 +357,7 @@ el.projCardsContainer.addEventListener("click", (e) => {
     //saveEditedToDos(projId, todoId, todoEl);
     //console.log(document.getElementById(todoId), tasks, projId);
     if (unsavedTodoFormGaurd(projId, todoId)) return;
+    
     state.skipTodoEdit = true;
 
     renderEditableTodoCard(projId, todoId, projEl);
@@ -372,6 +422,7 @@ el.projTodoFormContainer.addEventListener("click", (e) => {
     toLocalStorage(tasks);
     renderIncrementalToDoCard(projId, projEl);
     displayToggleTodoForm(false);
+    ClearTodoFormInputs;
     
   }
 })
