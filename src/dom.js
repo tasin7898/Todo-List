@@ -80,7 +80,7 @@ export const editToDoCards = ({title = "", description = "", dueDate = "", prior
   const priorityTodo = document.createElement("select");
   Object.assign(priorityTodo, { className : "priority", name: "priorityEdit" });
 
-  const prios = ["", "low", "medium", "high"];
+  const prios = ["", "Low", "Medium", "High"];
   prios.forEach(prio => {
     const option = document.createElement("option");
     if(!prio) Object.assign(option, {selected : true, disabled : true, textContent : "Choose Priority", value : ""});
