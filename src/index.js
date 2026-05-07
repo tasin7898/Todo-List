@@ -86,7 +86,7 @@ const outSideProjFormHandler = (target) => {
   }
 }
 const outSideTodoFormhandler = (target, isAddTodoBtn) => {
-  const todoFormOpen = !el.projTodoFormContainer.classList.contains("hidden");
+  const todoFormOpen = el.projTodoFormContainer.classList.contains("open");
   
   if(!todoFormOpen) return;
   if(isAddTodoBtn) return;
@@ -172,14 +172,14 @@ document.addEventListener("click", (e) => {
   
   if (el.createProjBtn.contains(target)) {
     if(unsavedTodoFormGaurd(null, null)) return;
-    const formDirty = !el.projTodoFormContainer.classList.contains("hidden") && [...Object.values(getToDoValues())].some(Boolean);
+    const formDirty = el.projTodoFormContainer.classList.contains("open") && [...Object.values(getToDoValues())].some(Boolean);
     if(formDirty) return;
     console.log("gg")
     displayToggleProjectPromt(true);
     
   }
   const isEditingTodo = state.editingTodo.projId && state.editingTodo.todoId;
-  const formDirty = !el.projTodoFormContainer.classList.contains("hidden") && [...Object.values(getToDoValues())].some(Boolean);
+  const formDirty = el.projTodoFormContainer.classList.contains("open") && [...Object.values(getToDoValues())].some(Boolean);
     
   if(!isEditingTodo && !formDirty) {
   todoExpandOutsideClickHandler(target);
@@ -243,13 +243,16 @@ el.projCardsContainer.addEventListener("click", (e) => {
   //if (!todoEl) return;
   const todoId = todoEl?.id;
   
-
+  console.log("CLICKED:", e.target);
+console.log("BUTTON:", button);
+console.log("BUTTON ID:", button?.id);
+console.log("BUTTON CLASS:", button?.className);
 
   if(button.classList.contains("add-todo")){
     //state.skipTodoForm = true;
     const editingProj = !!state.editingProjId;
     const editingTodo = !!state.editingTodo.projId && !!state.editingTodo.todoId;
-    const formDirty = !el.projTodoFormContainer.classList.contains("hidden") && [...Object.values(getToDoValues())].some(Boolean);
+    const formDirty = el.projTodoFormContainer.classList.contains("open") && [...Object.values(getToDoValues())].some(Boolean);
 
   if (editingProj || editingTodo || formDirty) return;
 
@@ -262,7 +265,7 @@ el.projCardsContainer.addEventListener("click", (e) => {
   }
   if(button.classList.contains("delete-proj")){
     if(unsavedTodoFormGaurd(null, null)) return;
-    const formDirty = !el.projTodoFormContainer.classList.contains("hidden") && [...Object.values(getToDoValues())].some(Boolean);
+    const formDirty = el.projTodoFormContainer.classList.contains("open") && [...Object.values(getToDoValues())].some(Boolean);
     if(formDirty) return;
     removeProject(projId);
     toLocalStorage(tasks);
@@ -272,7 +275,7 @@ el.projCardsContainer.addEventListener("click", (e) => {
   }
   if(button.classList.contains("edit-proj")){
     if(unsavedTodoFormGaurd(null, null)) return;
-    const formDirty = !el.projTodoFormContainer.classList.contains("hidden") && [...Object.values(getToDoValues())].some(Boolean);
+    const formDirty = el.projTodoFormContainer.classList.contains("open") && [...Object.values(getToDoValues())].some(Boolean);
     if(formDirty) return;
     state.skipProjEdit = true;
     renderEditableProjCard(projId);
@@ -417,12 +420,14 @@ el.projTodoFormContainer.addEventListener("click", (e) => {
     e.preventDefault();
     const projId = el.projTodoFormContainer.dataset.projId;
     const projEl = document.getElementById(projId);
-
+    console.log("haguuuuuuuuu")
+    console.log("FORM CLASS:", el.projTodoFormContainer.classList.contains("open"));
+console.log("DIRTY:", [...Object.values(getToDoValues())].some(Boolean));
     addToDoValues(projId);
     toLocalStorage(tasks);
     renderIncrementalToDoCard(projId, projEl);
     displayToggleTodoForm(false);
-    ClearTodoFormInputs;
+    ClearTodoFormInputs();
     
   }
 })

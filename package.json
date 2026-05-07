@@ -5,11 +5,10 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack serve --mode development --open",
     "build": "webpack --mode production",
-    "dev": "webpack serve --mode development",
-    "deploy": "git subtree push --prefix dist origin gh-pages",
-    "start": "webpack serve --mode development --open"
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "repository": {
     "type": "git",
@@ -30,6 +29,7 @@
     "crypto-browserify": "^3.3.0",
     "css-loader": "^7.1.4",
     "esbuild": "^0.28.0",
+    "gh-pages": "^6.3.0",
     "html-loader": "^5.1.0",
     "html-webpack-plugin": "^5.6.7",
     "https-browserify": "^1.0.0",
@@ -46,8 +46,8 @@
     "url": "^0.11.4",
     "util": "^0.12.5",
     "vm-browserify": "^1.1.2",
-    "webpack": "^5.106.2",
-    "webpack-cli": "^7.0.2",
+    "webpack": "^5.88.2",
+    "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^5.2.3"
   },
   "dependencies": {
